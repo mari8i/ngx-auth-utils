@@ -1,0 +1,49 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "cli": {
+    "analytics": "ddbbb158-dcc9-4d82-9f88-9a07cb0db520"
+  },
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "ngx-auth-utils": {
+      "projectType": "library",
+      "root": "projects/ngx-auth-utils",
+      "sourceRoot": "projects/ngx-auth-utils/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/ngx-auth-utils/tsconfig.lib.json",
+            "project": "projects/ngx-auth-utils/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-auth-utils/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-auth-utils/src/test.ts",
+            "tsConfig": "projects/ngx-auth-utils/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-auth-utils/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-auth-utils/tsconfig.lib.json",
+              "projects/ngx-auth-utils/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**"]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "ngx-auth-utils"
+}
