@@ -70,7 +70,10 @@ export class AuthenticationService {
             throw Error('No refresh token');
         }
         return this.authenticationProvider.refreshToken(accessToken, refreshToken).pipe(
-            tap((newAccessToken) => this.storageProvider.store(this.AUTH_ACCESS_TOKEN, newAccessToken)),
+            tap((newAccessToken) => {
+                this.storageProvider.store(this.AUTH_ACCESS_TOKEN, newAccessToken.accessToken);
+                this.storageProvider.store(this.AUTH_REFRESH_TOKEN, newAccessToken.refreshToken);
+            }),
             map((newAccessToken) => newAccessToken.accessToken)
         );
     }

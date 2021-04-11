@@ -36,6 +36,8 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
                     if (refreshToken != null) {
                         return this.authenticationService.refreshToken().pipe(
                             switchMap((newToken) => {
+                                console.error('--->renew', newToken);
+                                // TODO: possibily not needed
                                 const clonedReq = AuthInterceptor.addHeaderToRequest(
                                     request,
                                     this.authenticationHeader,

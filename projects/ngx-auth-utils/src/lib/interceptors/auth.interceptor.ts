@@ -30,7 +30,6 @@ export class AuthInterceptor implements HttpInterceptor {
 
         if (accessToken) {
             const clonedReq = AuthInterceptor.addHeaderToRequest(request, this.authenticationHeader, this.tokenType, accessToken);
-
             return next.handle(clonedReq);
         }
 
