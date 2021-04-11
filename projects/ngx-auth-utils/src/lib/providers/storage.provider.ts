@@ -1,28 +1,27 @@
 export abstract class StorageProvider {
-  public abstract store(key: string, value: unknown): any;
+    public abstract store(key: string, value: unknown): any;
 
-  public abstract retrieve(key: string): any;
+    public abstract retrieve(key: string): any;
 
-  public abstract clear(key: string): void;
+    public abstract clear(key: string): void;
 }
 
 export class MemoryStorageProvider extends StorageProvider {
+    private values: Map<string, any> = new Map<string, any>();
 
-  private values: Map<string, any> = new Map<string, any>();
+    constructor() {
+        super();
+    }
 
-  constructor() {
-    super();
-  }
+    clear(key: string): void {
+        this.values.delete(key);
+    }
 
-  clear(key: string): void {
-    this.values.delete(key);
-  }
+    retrieve(key: string): any {
+        return this.values.get(key);
+    }
 
-  retrieve(key: string): any {
-    return this.values.get(key);
-  }
-
-  store(key: string, value: unknown): any {
-    return this.values.set(key, value);
-  }
+    store(key: string, value: unknown): any {
+        return this.values.set(key, value);
+    }
 }
