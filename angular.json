@@ -1,7 +1,8 @@
 {
     "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
     "cli": {
-        "analytics": "ddbbb158-dcc9-4d82-9f88-9a07cb0db520"
+        "analytics": "ddbbb158-dcc9-4d82-9f88-9a07cb0db520",
+        "defaultCollection": "@angular-eslint/schematics"
     },
     "version": 1,
     "newProjectRoot": "projects",
@@ -33,11 +34,13 @@
                     }
                 },
                 "lint": {
-                    "builder": "@angular-devkit/build-angular:tslint",
-                    "options": {
-                        "tsConfig": ["projects/ngx-auth-utils/tsconfig.lib.json", "projects/ngx-auth-utils/tsconfig.spec.json"],
-                        "exclude": ["**/node_modules/**"]
-                    }
+                  "builder": "@angular-eslint/builder:lint",
+                  "options": {
+                    "lintFilePatterns": [
+                      "**/*.ts",
+                      "**/*.html"
+                    ]
+                  }
                 }
             }
         }
