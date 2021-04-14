@@ -1,8 +1,9 @@
-import { Inject, Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
-import { map, take } from 'rxjs/operators';
-import { AuthenticationService } from '../services/authentication.service';
-import { NO_AUTH_REDIRECT_URL } from '../config';
+import {Inject, Injectable} from '@angular/core';
+import {CanActivate, Router, UrlTree} from '@angular/router';
+import {map, take} from 'rxjs/operators';
+import {AuthenticationService} from '../services/authentication.service';
+import {NO_AUTH_REDIRECT_URL} from '../config';
+import {Observable} from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -14,7 +15,7 @@ export class AuthGuard implements CanActivate {
         @Inject(NO_AUTH_REDIRECT_URL) private noAuthRedirectUrl: string | undefined
     ) {}
 
-    canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): any {
+    canActivate(): Observable<boolean | UrlTree> {
         return this.authenticationService.getAuthenticationState().pipe(
             take(1),
             map((user) => {

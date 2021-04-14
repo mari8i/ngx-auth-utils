@@ -1,9 +1,8 @@
-import { Inject, Injectable } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { AUTHENTICATION_HEADER, TOKEN_TYPE } from '../config';
-import { StorageProvider } from '../providers/storage.provider';
-import { AuthenticationService } from '../services/authentication.service';
+import {Inject, Injectable} from '@angular/core';
+import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {AUTHENTICATION_HEADER, TOKEN_TYPE} from '../config';
+import {AuthenticationService} from '../services/authentication.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -15,7 +14,7 @@ export class AuthInterceptor implements HttpInterceptor {
     ) {}
 
     public static addHeaderToRequest(
-        request: HttpRequest<any>,
+        request: HttpRequest<unknown>,
         authHeader: string,
         tokenType: string,
         accessToken: string

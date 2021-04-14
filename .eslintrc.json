@@ -1,6 +1,5 @@
 {
     "root": true,
-    "ignorePatterns": ["projects/**/*", "src/app/core/http-gen/**"],
     "overrides": [
         {
             "files": ["*.ts"],
