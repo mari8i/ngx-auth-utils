@@ -1,4 +1,4 @@
-import { Observable, of, ReplaySubject } from 'rxjs';
+import { Observable, of, ReplaySubject, throwError } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
 import { AuthenticationProvider } from '../providers/authentication.provider';
 import { Injectable } from '@angular/core';
@@ -12,8 +12,8 @@ export class AuthenticationService {
     private authenticationState = new ReplaySubject<any | null>(1);
     private authenticatedUserCache?: Observable<any | null>;
 
-    private readonly AUTH_ACCESS_TOKEN = 'ngx-auth-access-token';
-    private readonly AUTH_REFRESH_TOKEN = 'ngx-auth-refresh-token';
+    public readonly AUTH_ACCESS_TOKEN = 'ngx-auth-access-token';
+    public readonly AUTH_REFRESH_TOKEN = 'ngx-auth-refresh-token';
 
     constructor(private storageProvider: StorageProvider, public authenticationProvider: AuthenticationProvider) {}
 
@@ -25,19 +25,24 @@ export class AuthenticationService {
         return this.authenticationUser !== null;
     }
 
-    public initialize(): void {
+    public initialize(): Observable<any | null> {
         if (this.getAccessToken() != null) {
-            this.getAuthenticatedUser(true).pipe(take(1)).subscribe();
-        } else {
-            this.authenticate(null);
+            return this.getAuthenticatedUser(true).pipe(
+                take(1),
+                catchError(() => of(null))
+            );
         }
+
+        this.authenticate(null);
+        return of(null);
     }
 
     public getAuthenticatedUser(force?: boolean): Observable<any | null> {
         if (!this.authenticatedUserCache || force || !this.isAuthenticated()) {
             this.authenticatedUserCache = this.authenticationProvider.fetchUser().pipe(
-                catchError(() => {
-                    return of(null);
+                catchError((error) => {
+                    this.logout();
+                    return throwError(error);
                 }),
                 tap((account: any | null) => {
                     this.authenticate(account);
