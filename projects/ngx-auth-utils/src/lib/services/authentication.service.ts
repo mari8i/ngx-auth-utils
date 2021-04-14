@@ -1,24 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Observable, of, ReplaySubject, throwError } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
 import { AuthenticationProvider } from '../providers/authentication.provider';
 import { Injectable } from '@angular/core';
 import { StorageProvider } from '../providers/storage.provider';
-import { GenericUserObject } from '../types';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthenticationService {
-    private authenticationUser: GenericUserObject | null = null;
-    private authenticationState = new ReplaySubject<GenericUserObject | null>(1);
-    private authenticatedUserCache?: Observable<GenericUserObject | null>;
+    private authenticationUser: any | null = null;
+    private authenticationState = new ReplaySubject<any | null>(1);
+    private authenticatedUserCache?: Observable<any | null>;
 
     public readonly AUTH_ACCESS_TOKEN = 'ngx-auth-access-token';
     public readonly AUTH_REFRESH_TOKEN = 'ngx-auth-refresh-token';
 
     constructor(private storageProvider: StorageProvider, public authenticationProvider: AuthenticationProvider) {}
 
-    public getAuthenticationState(): Observable<GenericUserObject | null> {
+    public getAuthenticationState(): Observable<any | null> {
         return this.authenticationState.asObservable();
     }
 
@@ -26,7 +27,7 @@ export class AuthenticationService {
         return this.authenticationUser !== null;
     }
 
-    public initialize(): Observable<GenericUserObject | null> {
+    public initialize(): Observable<any | null> {
         if (this.getAccessToken() != null) {
             return this.getAuthenticatedUser(true).pipe(
                 take(1),
@@ -38,14 +39,14 @@ export class AuthenticationService {
         return of(null);
     }
 
-    public getAuthenticatedUser(force?: boolean): Observable<GenericUserObject | null> {
+    public getAuthenticatedUser(force?: boolean): Observable<any | null> {
         if (!this.authenticatedUserCache || force || !this.isAuthenticated()) {
             this.authenticatedUserCache = this.authenticationProvider.fetchUser().pipe(
                 catchError((error) => {
                     this.logout();
                     return throwError(error);
                 }),
-                tap((account: GenericUserObject | null) => {
+                tap((account: any | null) => {
                     this.authenticate(account);
                 }),
                 shareReplay()
@@ -54,7 +55,7 @@ export class AuthenticationService {
         return this.authenticatedUserCache;
     }
 
-    public login<K>(credentials: K): Observable<GenericUserObject | null> {
+    public login<K>(credentials: K): Observable<any | null> {
         return this.authenticationProvider.doLogin(credentials).pipe(
             tap((authResponse) => {
                 this.storageProvider.store(this.AUTH_ACCESS_TOKEN, authResponse.accessToken);
@@ -94,7 +95,6 @@ export class AuthenticationService {
 
     public logout(): void {
         // TODO: Server logout
-        // this.authService.authTokenLogoutCreate().subscribe();
 
         // Removing the token stored in identity service and into the local storage.
         this.authenticate(null);
@@ -102,8 +102,10 @@ export class AuthenticationService {
         this.storageProvider.clear(this.AUTH_REFRESH_TOKEN);
     }
 
-    private authenticate(identity: GenericUserObject | null): void {
+    private authenticate(identity: any | null): void {
         this.authenticationUser = identity;
         this.authenticationState.next(this.authenticationUser);
     }
 }
+
+/* eslint-enable @typescript-eslint/no-explicit-any */
