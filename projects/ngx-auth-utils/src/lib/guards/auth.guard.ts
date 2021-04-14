@@ -1,9 +1,9 @@
-import {Inject, Injectable} from '@angular/core';
-import {CanActivate, Router, UrlTree} from '@angular/router';
-import {map, take} from 'rxjs/operators';
-import {AuthenticationService} from '../services/authentication.service';
-import {NO_AUTH_REDIRECT_URL} from '../config';
-import {Observable} from 'rxjs';
+import { Inject, Injectable } from '@angular/core';
+import { CanActivate, Router, UrlTree } from '@angular/router';
+import { map, take } from 'rxjs/operators';
+import { AuthenticationService } from '../services/authentication.service';
+import { NO_AUTH_REDIRECT_URL } from '../config';
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
