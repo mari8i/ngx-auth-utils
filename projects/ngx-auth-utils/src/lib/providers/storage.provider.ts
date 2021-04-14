@@ -1,13 +1,15 @@
-export abstract class StorageProvider {
-    public abstract store(key: string, value: unknown): any;
+export type storageValue = string | null; 
 
-    public abstract retrieve(key: string): any;
+export abstract class StorageProvider {
+    public abstract store(key: string, value: unknown): storageValue;
+
+    public abstract retrieve(key: string): storageValue;
 
     public abstract clear(key: string): void;
 }
 
 export class MemoryStorageProvider extends StorageProvider {
-    private values: Map<string, any> = new Map<string, any>();
+    private values: Map<string, storageValue> = new Map<string, storageValue>();
 
     constructor() {
         super();
@@ -17,11 +19,12 @@ export class MemoryStorageProvider extends StorageProvider {
         this.values.delete(key);
     }
 
-    retrieve(key: string): any {
-        return this.values.get(key);
+    retrieve(key: string): storageValue {
+        return this.values.get(key) as storageValue;
     }
 
-    store(key: string, value: unknown): any {
-        return this.values.set(key, value);
+    store(key: string, value: storageValue): storageValue {
+        this.values.set(key, value);
+        return value;
     }
 }

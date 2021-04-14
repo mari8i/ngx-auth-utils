@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { catchError, concatMap } from 'rxjs/operators';
+import { concatMap } from 'rxjs/operators';
 import { AuthenticationProvider } from '../providers/authentication.provider';
 import { MemoryStorageProvider, StorageProvider } from '../providers/storage.provider';
 
