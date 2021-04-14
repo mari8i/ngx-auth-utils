@@ -1,4 +1,4 @@
-export type storageValue = string | null; 
+export type storageValue = string | null;
 
 export abstract class StorageProvider {
     public abstract store(key: string, value: unknown): storageValue;
