@@ -9,7 +9,8 @@
         "test": "ng test",
         "lint": "ng lint",
         "prettier:format": "prettier --write \"**/*.{js,ts,html,scss,json}\"",
-        "prettier:check": "prettier --check \"**/*.{js,ts,html,scss,json}\""
+        "prettier:check": "prettier --check \"**/*.{js,ts,html,scss,json}\"",
+        "prepare": "husky install"
     },
     "private": false,
     "dependencies": {
@@ -27,11 +28,23 @@
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "~0.1102.8",
+        "@angular-eslint/builder": "2.0.2",
+        "@angular-eslint/eslint-plugin": "2.0.2",
+        "@angular-eslint/eslint-plugin-template": "2.0.2",
+        "@angular-eslint/schematics": "2.0.2",
+        "@angular-eslint/template-parser": "2.0.2",
         "@angular/cli": "~11.2.8",
         "@angular/compiler-cli": "~11.2.9",
         "@types/jasmine": "~3.6.0",
         "@types/node": "^12.11.1",
+        "@typescript-eslint/eslint-plugin": "4.16.1",
+        "@typescript-eslint/parser": "4.16.1",
         "codelyzer": "^6.0.0",
+        "eslint": "^7.6.0",
+        "eslint-plugin-import": "2.22.1",
+        "eslint-plugin-jsdoc": "30.7.6",
+        "eslint-plugin-prefer-arrow": "1.2.2",
+        "husky": "^6.0.0",
         "jasmine-core": "~3.6.0",
         "jasmine-spec-reporter": "~5.0.0",
         "karma": "~6.1.0",
@@ -44,17 +57,10 @@
         "protractor": "~7.0.0",
         "ts-node": "~8.3.0",
         "tslint": "~6.1.0",
-        "typescript": "~4.1.5",
-        "eslint": "^7.6.0",
-        "eslint-plugin-import": "2.22.1",
-        "eslint-plugin-jsdoc": "30.7.6",
-        "eslint-plugin-prefer-arrow": "1.2.2",
-        "@angular-eslint/builder": "2.0.2",
-        "@angular-eslint/eslint-plugin": "2.0.2",
-        "@angular-eslint/eslint-plugin-template": "2.0.2",
-        "@angular-eslint/schematics": "2.0.2",
-        "@angular-eslint/template-parser": "2.0.2",
-        "@typescript-eslint/eslint-plugin": "4.16.1",
-        "@typescript-eslint/parser": "4.16.1"
+        "typescript": "~4.1.5"
+    },
+    "lint-staged": {
+        "*.ts": "eslint --cache --fix",
+        "*.{js,css,md,ts,json}": "prettier --write"
     }
 }
