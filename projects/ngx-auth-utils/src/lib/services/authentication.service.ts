@@ -3,21 +3,22 @@ import { catchError, map, shareReplay, switchMap, take, tap } from 'rxjs/operato
 import { AuthenticationProvider } from '../providers/authentication.provider';
 import { Injectable } from '@angular/core';
 import { StorageProvider } from '../providers/storage.provider';
+import { GenericUserObject } from '../types';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthenticationService {
-    private authenticationUser: any | null = null;
-    private authenticationState = new ReplaySubject<any | null>(1);
-    private authenticatedUserCache?: Observable<any | null>;
+    private authenticationUser: GenericUserObject | null = null;
+    private authenticationState = new ReplaySubject<GenericUserObject | null>(1);
+    private authenticatedUserCache?: Observable<GenericUserObject | null>;
 
     public readonly AUTH_ACCESS_TOKEN = 'ngx-auth-access-token';
     public readonly AUTH_REFRESH_TOKEN = 'ngx-auth-refresh-token';
 
     constructor(private storageProvider: StorageProvider, public authenticationProvider: AuthenticationProvider) {}
 
-    public getAuthenticationState(): Observable<any | null> {
+    public getAuthenticationState(): Observable<GenericUserObject | null> {
         return this.authenticationState.asObservable();
     }
 
@@ -25,7 +26,7 @@ export class AuthenticationService {
         return this.authenticationUser !== null;
     }
 
-    public initialize(): Observable<any | null> {
+    public initialize(): Observable<GenericUserObject | null> {
         if (this.getAccessToken() != null) {
             return this.getAuthenticatedUser(true).pipe(
                 take(1),
@@ -37,14 +38,14 @@ export class AuthenticationService {
         return of(null);
     }
 
-    public getAuthenticatedUser(force?: boolean): Observable<any | null> {
+    public getAuthenticatedUser(force?: boolean): Observable<GenericUserObject | null> {
         if (!this.authenticatedUserCache || force || !this.isAuthenticated()) {
             this.authenticatedUserCache = this.authenticationProvider.fetchUser().pipe(
                 catchError((error) => {
                     this.logout();
                     return throwError(error);
                 }),
-                tap((account: any | null) => {
+                tap((account: GenericUserObject | null) => {
                     this.authenticate(account);
                 }),
                 shareReplay()
@@ -53,7 +54,7 @@ export class AuthenticationService {
         return this.authenticatedUserCache;
     }
 
-    public login<K>(credentials: K): Observable<any | null> {
+    public login<K>(credentials: K): Observable<GenericUserObject | null> {
         return this.authenticationProvider.doLogin(credentials).pipe(
             tap((authResponse) => {
                 this.storageProvider.store(this.AUTH_ACCESS_TOKEN, authResponse.accessToken);
@@ -101,7 +102,7 @@ export class AuthenticationService {
         this.storageProvider.clear(this.AUTH_REFRESH_TOKEN);
     }
 
-    private authenticate(identity: any | null): void {
+    private authenticate(identity: GenericUserObject | null): void {
         this.authenticationUser = identity;
         this.authenticationState.next(this.authenticationUser);
     }
