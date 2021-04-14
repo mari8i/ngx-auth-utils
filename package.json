@@ -5,6 +5,7 @@
         "ng": "ng",
         "start": "ng serve",
         "build": "ng build",
+        "build:prod": "ng build ngx-auth-utils --prod",
         "test": "ng test",
         "lint": "ng lint",
         "prettier:format": "prettier --write \"**/*.{js,ts,html,scss,json}\"",

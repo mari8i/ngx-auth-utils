@@ -1,17 +1,11 @@
-import {ModuleWithProviders, NgModule, Provider} from '@angular/core';
-import {AuthenticationProvider, FakeAuthenticationProvider} from './providers/authentication.provider';
-import {
-    AUTHENTICATION_HEADER,
-    HOME_URL,
-    NO_AUTH_REDIRECT_URL,
-    SESSION_EXPIRED_REDIRECT_URL,
-    TOKEN_TYPE
-} from './config';
-import {AuthenticationService} from './services/authentication.service';
-import {MemoryStorageProvider, StorageProvider} from './providers/storage.provider';
-import {AuthInterceptor} from './interceptors/auth.interceptor';
-import {HTTP_INTERCEPTORS} from '@angular/common/http';
-import {AuthExpiredInterceptor} from './interceptors/auth-expired.interceptor';
+import { ModuleWithProviders, NgModule, Provider } from '@angular/core';
+import { AuthenticationProvider, FakeAuthenticationProvider } from './providers/authentication.provider';
+import { AUTHENTICATION_HEADER, HOME_URL, NO_AUTH_REDIRECT_URL, SESSION_EXPIRED_REDIRECT_URL, TOKEN_TYPE } from './config';
+import { AuthenticationService } from './services/authentication.service';
+import { MemoryStorageProvider, StorageProvider } from './providers/storage.provider';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthExpiredInterceptor } from './interceptors/auth-expired.interceptor';
 
 export interface NgxAuthUtilsConfig {
     authenticationProvider: Provider;
