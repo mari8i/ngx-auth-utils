@@ -19,14 +19,7 @@ jobs:
         node-version: [10.x, 12.x, 14.x, 15.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
-    - uses: actions/checkout@v2
-    - uses: nanasess/setup-chromedriver@master
-      with:
-        # Optional: do not specify to match Chrome's version
-        chromedriver-version: '88.0.4324.96'
-    - run: |
-        export DISPLAY=:99
-        chromedriver --url-base=/wd/hub &
+    - uses: browser-actions/setup-chrome@latest
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
