@@ -1,27 +1,90 @@
 # NgxAuthUtils
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.8.
+An Angular library to ease the authentication integration with a backend.
 
-## Development server
+Currently supports token based authentication with optional refresh token (for JWT authentication)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Installation
 
-## Code scaffolding
+```shell
+npm install -D ngx-auth-utils
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Setup
 
-## Build
+Add `NgxAuthUtilsModule.forRoot(conf)` in your `app.module.ts`.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Here is an example:
 
-## Running unit tests
+```typescript
+NgxAuthUtilsModule.forRoot({
+    authenticationProvider: {
+        provide: AuthenticationProvider,
+        useClass: MyAuthenticationProvider, // your AuthenticationProvider implementation
+        deps: [MyDep1, MyDep2],
+    },
+    storageProvider: {
+        provide: StorageProvider,
+        useClass: MyStorageProvider, // your StorageProvider implementation
+        deps: [MyStorageDep1],
+    },
+    homeUrl: '/',
+    noAuthRedirectUrl: '/auth/login',
+    sessionExpiredRedirectUrl: '/auth/login',
+});
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Authentication provider
 
-## Running end-to-end tests
+The `AuthenticationProvider` provides an interface with your authentication system the `AuthenticationService`.
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Any implementation of this class **must** implement the `fetchUser` and the `doLogin` methods.
 
-## Further help
+#### `doLogin(credentials: unknown): Observable<AccessTokenModel>`
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Attempts to login
+
+```typescript
+import { AccessTokenModel, AuthenticationProvider } from 'ngx-auth-utils';
+
+export class MyAuthenticationProvider extends AuthenticationProvider {
+    constructor(private myService: MyDep1, private myService2: MyDep2) {
+        super();
+    }
+
+    fetchUser(): Observable<MyUserType> {
+        return this.myService.getUser();
+    }
+
+    doLogin(credentials: TokenObtainPair): Observable<AccessTokenModel> {
+        return this.tokenService.tokenCreate$Json({ body: credentials }).pipe(
+            map((tokenPair: TokenLoginResponse) => {
+                return {
+                    accessToken: tokenPair.access,
+                    refreshToken: tokenPair.refresh,
+                };
+            })
+        );
+    }
+
+    refreshToken(accessToken: string, refreshToken: string): Observable<AccessTokenModel> {
+        return this.tokenService.tokenRefreshCreate$Json({ body: { access: accessToken, refresh: refreshToken } }).pipe(
+            map((tokenPair: TokenRefreshResponse) => {
+                return {
+                    accessToken: tokenPair.access,
+                    refreshToken: refreshToken,
+                };
+            })
+        );
+    }
+}
+```
+
+## Development
+
+Setup the project:
+
+```shell
+   npm install
+   npm run prepare
+```
