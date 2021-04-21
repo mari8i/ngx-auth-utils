@@ -9,3 +9,4 @@ export * from './lib/providers/storage.provider';
 export * from './lib/services/authentication.service';
 export * from './lib/guards/auth.guard';
 export * from './lib/guards/login.guard';
+export * from './lib/resolvers/user.resolver';
