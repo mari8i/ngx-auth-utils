@@ -14,7 +14,7 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
         private router: Router,
         private storageProvider: StorageProvider,
         private authenticationService: AuthenticationService,
-        @Inject(SESSION_EXPIRED_REDIRECT_URL) private sessionExpiredRedirectURl: string | undefined,
+        @Inject(SESSION_EXPIRED_REDIRECT_URL) private sessionExpiredRedirectUrl: string | undefined,
         @Inject(AUTHENTICATION_HEADER)
         private authenticationHeader: string = 'Authorization',
         @Inject(TOKEN_TYPE) private tokenType: string = 'Bearer'
@@ -67,8 +67,8 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
 
     private handle401Failure(): void {
         this.authenticationService.logout();
-        if (this.sessionExpiredRedirectURl != null) {
-            this.router.navigate([this.sessionExpiredRedirectURl]);
+        if (this.sessionExpiredRedirectUrl != null) {
+            this.router.navigate([this.sessionExpiredRedirectUrl]);
         }
     }
 }

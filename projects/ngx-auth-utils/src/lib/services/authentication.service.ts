@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Observable, of, ReplaySubject, throwError } from 'rxjs';
-import { catchError, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
+import { catchError, concatMap, map, shareReplay, take, tap } from 'rxjs/operators';
 import { AuthenticationProvider } from '../providers/authentication.provider';
 import { Injectable } from '@angular/core';
 import { StorageProvider } from '../providers/storage.provider';
@@ -63,7 +63,7 @@ export class AuthenticationService {
                     this.storageProvider.store(this.AUTH_REFRESH_TOKEN, authResponse.refreshToken);
                 }
             }),
-            switchMap(() => this.getAuthenticatedUser(true))
+            concatMap(() => this.getAuthenticatedUser(true))
         );
     }
 
