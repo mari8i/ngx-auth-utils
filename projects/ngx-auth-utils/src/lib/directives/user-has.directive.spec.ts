@@ -13,7 +13,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class AboutComponent {}
 
-describe('UserHasAnyDirective', () => {
+describe('UserHasDirective', () => {
     let fixture: ComponentFixture<AboutComponent>;
     let authService: jasmine.SpyObj<AuthenticationService>;
 
@@ -33,6 +33,13 @@ describe('UserHasAnyDirective', () => {
         }).createComponent(AboutComponent);
 
         authService = TestBed.inject(AuthenticationService) as jasmine.SpyObj<AuthenticationService>;
+    });
+
+    it('Hides contents when user is not authenticated', () => {
+        mockAuthState(null);
+
+        const div: HTMLElement = fixture.nativeElement.querySelector('#any');
+        expect(div).toBeNull();
     });
 
     it('shows contents if user matches any values', () => {

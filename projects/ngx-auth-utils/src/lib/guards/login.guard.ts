@@ -5,6 +5,7 @@ import { AuthenticationService } from '../services/authentication.service';
 import { HOME_URL } from '../config';
 import { Observable } from 'rxjs';
 
+// TODO: Rename
 @Injectable({
     providedIn: 'root',
 })

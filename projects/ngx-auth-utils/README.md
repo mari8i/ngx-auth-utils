@@ -23,3 +23,7 @@ Run `ng test ngx-auth-utils` to execute the unit tests via [Karma](https://karma
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+IDEAS:
+
+-   Centralize events in a service that can be subscribed (on login, on logout, on auth expired, ...)
