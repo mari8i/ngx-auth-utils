@@ -1,11 +1,11 @@
-import { Directive, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
-import { Subscription } from 'rxjs';
+import { ConditionalDirective } from './conditional.directive';
 
 @Directive({
     selector: '[ngxAuthHas]',
 })
-export class UserHasDirective implements OnInit, OnDestroy {
+export class UserHasDirective extends ConditionalDirective {
     @Input()
     ngxAuthHas = '';
 
@@ -18,24 +18,12 @@ export class UserHasDirective implements OnInit, OnDestroy {
     @Input()
     ngxAuthHasEq?: string;
 
-    private hasView = false;
+    constructor(authenticationService: AuthenticationService, templateRef: TemplateRef<unknown>, viewContainer: ViewContainerRef) {
+        super(authenticationService, templateRef, viewContainer);
+    }
 
-    private authSub!: Subscription;
-
-    constructor(
-        private authenticationService: AuthenticationService,
-        private templateRef: TemplateRef<unknown>,
-        private viewContainer: ViewContainerRef
-    ) {}
-
-    ngOnInit(): void {
-        this.authSub = this.authenticationService.getAuthenticationState().subscribe((user) => {
-            if (user && this.checkConditions(user)) {
-                this.show();
-            } else {
-                this.hide();
-            }
-        });
+    shouldShow(user: { [key: string]: unknown }): boolean {
+        return user != null && this.checkConditions(user);
     }
 
     private checkConditions(user: { [key: string]: unknown }): boolean {
@@ -69,25 +57,5 @@ export class UserHasDirective implements OnInit, OnDestroy {
 
     private userHasEqValue(userValue: unknown, userHasEq: unknown): boolean {
         return userValue === userHasEq;
-    }
-
-    private show(): void {
-        if (!this.hasView) {
-            this.viewContainer.createEmbeddedView(this.templateRef);
-            this.hasView = true;
-        }
-    }
-
-    private hide(): void {
-        if (this.hasView) {
-            this.viewContainer.clear();
-            this.hasView = false;
-        }
-    }
-
-    ngOnDestroy(): void {
-        if (this.authSub) {
-            this.authSub.unsubscribe();
-        }
     }
 }

@@ -1,51 +1,19 @@
-import { Directive, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
-import { Subscription } from 'rxjs';
+import { ConditionalDirective } from './conditional.directive';
 
 @Directive({
     selector: '[ngxAuth]',
 })
-export class UserDirective implements OnInit, OnDestroy {
+export class UserDirective extends ConditionalDirective {
     @Input()
     ngxAuth = true;
 
-    private hasView = false;
-
-    private authSub!: Subscription;
-
-    constructor(
-        private authenticationService: AuthenticationService,
-        private templateRef: TemplateRef<unknown>,
-        private viewContainer: ViewContainerRef
-    ) {}
-
-    ngOnInit(): void {
-        this.authSub = this.authenticationService.getAuthenticationState().subscribe((user) => {
-            if (!!user === this.ngxAuth) {
-                this.show();
-            } else {
-                this.hide();
-            }
-        });
+    constructor(authenticationService: AuthenticationService, templateRef: TemplateRef<unknown>, viewContainer: ViewContainerRef) {
+        super(authenticationService, templateRef, viewContainer);
     }
 
-    private show(): void {
-        if (!this.hasView) {
-            this.viewContainer.createEmbeddedView(this.templateRef);
-            this.hasView = true;
-        }
-    }
-
-    private hide(): void {
-        if (this.hasView) {
-            this.viewContainer.clear();
-            this.hasView = false;
-        }
-    }
-
-    ngOnDestroy(): void {
-        if (this.authSub) {
-            this.authSub.unsubscribe();
-        }
+    shouldShow(user: unknown): boolean {
+        return !!user === this.ngxAuth;
     }
 }
