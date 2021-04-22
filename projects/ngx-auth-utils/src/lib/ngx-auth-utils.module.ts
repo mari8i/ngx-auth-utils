@@ -6,6 +6,8 @@ import { MemoryStorageProvider, StorageProvider } from './providers/storage.prov
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthExpiredInterceptor } from './interceptors/auth-expired.interceptor';
+import { UserHasDirective } from './directives/user-has.directive';
+import { UserHasAllDirective } from './directives/user-has-all.directive';
 
 export interface NgxAuthUtilsConfig {
     authenticationProvider: Provider;
@@ -18,7 +20,7 @@ export interface NgxAuthUtilsConfig {
 }
 
 @NgModule({
-    declarations: [],
+    declarations: [UserHasDirective, UserHasAllDirective],
     imports: [],
     exports: [],
     providers: [

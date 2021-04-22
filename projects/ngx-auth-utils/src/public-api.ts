@@ -10,3 +10,5 @@ export * from './lib/services/authentication.service';
 export * from './lib/guards/auth.guard';
 export * from './lib/guards/login.guard';
 export * from './lib/resolvers/user.resolver';
+export * from './lib/directives/user-has-all.directive';
+export * from './lib/directives/user-has.directive';
