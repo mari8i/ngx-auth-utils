@@ -16,6 +16,7 @@ export class AuthenticationService {
 
     public readonly AUTH_ACCESS_TOKEN = 'ngx-auth-access-token';
     public readonly AUTH_REFRESH_TOKEN = 'ngx-auth-refresh-token';
+    public readonly AUTH_METADATA = 'ngx-auth-metadata';
 
     constructor(private storageProvider: StorageProvider, public authenticationProvider: AuthenticationProvider) {}
 
@@ -62,6 +63,9 @@ export class AuthenticationService {
                 if (authResponse.refreshToken) {
                     this.storageProvider.store(this.AUTH_REFRESH_TOKEN, authResponse.refreshToken);
                 }
+                if (authResponse.metadata) {
+                    this.storageProvider.store(this.AUTH_METADATA, JSON.stringify(authResponse.metadata));
+                }
             }),
             concatMap(() => this.getAuthenticatedUser(true))
         );
@@ -70,16 +74,18 @@ export class AuthenticationService {
     public refreshToken(): Observable<string> {
         const accessToken = this.getAccessToken();
         const refreshToken = this.getRefreshToken();
+        const metadata = this.getMetadata();
         if (!accessToken) {
             throw Error('No accesso token');
         }
         if (!refreshToken) {
             throw Error('No refresh token');
         }
-        return this.authenticationProvider.refreshToken(accessToken, refreshToken).pipe(
+        return this.authenticationProvider.refreshToken(accessToken, refreshToken, metadata).pipe(
             tap((newAccessToken) => {
                 this.storageProvider.store(this.AUTH_ACCESS_TOKEN, newAccessToken.accessToken);
                 this.storageProvider.store(this.AUTH_REFRESH_TOKEN, newAccessToken.refreshToken);
+                this.storageProvider.store(this.AUTH_METADATA, JSON.stringify(newAccessToken.metadata));
             }),
             map((newAccessToken) => newAccessToken.accessToken)
         );
@@ -91,6 +97,14 @@ export class AuthenticationService {
 
     public getRefreshToken(): string | null {
         return this.storageProvider.retrieve(this.AUTH_REFRESH_TOKEN);
+    }
+
+    public getMetadata(): any | null {
+        const meta = this.storageProvider.retrieve(this.AUTH_METADATA);
+        if (meta) {
+            return JSON.parse(meta);
+        }
+        return null;
     }
 
     public logout(): void {
