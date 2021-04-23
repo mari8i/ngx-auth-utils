@@ -10,6 +10,8 @@ import { AuthInterceptor } from './auth.interceptor';
 
 @Injectable()
 export class AuthExpiredInterceptor implements HttpInterceptor {
+    private handlingRefresh = false;
+
     constructor(
         private router: Router,
         private storageProvider: StorageProvider,
@@ -20,23 +22,17 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
         @Inject(TOKEN_TYPE) private tokenType: string = 'Bearer'
     ) {}
 
-    // TODO: Configurable? / NEEDED?
-    // private isUrlInWhitelist(url: string): boolean {
-    //     return (
-    //         // login can have parameter fromLogout
-    //         url.startsWith('/login') || url === '/register' || url.startsWith('/reset-password') || url.startsWith('/activate')
-    //     );
-    // }
-
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         return next.handle(request).pipe(
             catchError((err: HttpErrorResponse) => {
-                if (err.status === 401) {
+                if (err.status === 401 && !this.handlingRefresh) {
+                    this.handlingRefresh = true;
+
                     const refreshToken = this.authenticationService.getRefreshToken();
                     if (refreshToken != null) {
                         return this.authenticationService.refreshToken().pipe(
                             switchMap((newToken) => {
-                                // TODO: possibily not needed
+                                this.handlingRefresh = false;
                                 const clonedReq = AuthInterceptor.addHeaderToRequest(
                                     request,
                                     this.authenticationHeader,
@@ -46,6 +42,7 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
                                 return next.handle(clonedReq);
                             }),
                             catchError(() => {
+                                this.handlingRefresh = false;
                                 this.handle401Failure();
                                 return EMPTY;
                             })
@@ -54,10 +51,6 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
 
                     this.handle401Failure();
                     return EMPTY;
-
-                    // if (this.isUrlInWhitelist(this.router.routerState.snapshot.url)) {
-                    //     return EMPTY;
-                    // }
                 }
                 return throwError(err);
             })
