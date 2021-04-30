@@ -7,6 +7,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthExpiredInterceptor } from './interceptors/auth-expired.interceptor';
 import { UserHasDirective } from './directives/user-has.directive';
+import { IsAuthDirective } from './directives/is-auth.directive';
 import { UserDirective } from './directives/user.directive';
 
 export interface NgxAuthUtilsConfig {
@@ -20,9 +21,9 @@ export interface NgxAuthUtilsConfig {
 }
 
 @NgModule({
-    declarations: [UserDirective, UserHasDirective],
+    declarations: [IsAuthDirective, UserHasDirective, UserDirective],
     imports: [],
-    exports: [UserDirective, UserHasDirective],
+    exports: [IsAuthDirective, UserHasDirective],
     providers: [
         {
             provide: HTTP_INTERCEPTORS,

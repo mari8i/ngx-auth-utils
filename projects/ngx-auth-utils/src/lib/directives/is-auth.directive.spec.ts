@@ -2,17 +2,18 @@ import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AuthenticationService } from '../services/authentication.service';
 import { BehaviorSubject } from 'rxjs';
-import { UserDirective } from './user.directive';
+import { IsAuthDirective } from './is-auth.directive';
 
 @Component({
     template: `
         <div id="auth" *ngxAuth>Auth</div>
         <div id="anon" *ngxAuth="false">Anon</div>
+        <div id="authCtx" *ngxAuth="true; user as u">{{ u.username }}</div>
     `,
 })
 export class TestComponent {}
 
-describe('UserDirective', () => {
+describe('IsAuthDirective', () => {
     let fixture: ComponentFixture<TestComponent>;
     let authService: jasmine.SpyObj<AuthenticationService>;
 
@@ -28,7 +29,7 @@ describe('UserDirective', () => {
 
         fixture = TestBed.configureTestingModule({
             providers: [{ provide: AuthenticationService, useValue: authSpy }],
-            declarations: [TestComponent, UserDirective],
+            declarations: [TestComponent, IsAuthDirective],
             schemas: [NO_ERRORS_SCHEMA],
         }).createComponent(TestComponent);
 
@@ -65,5 +66,14 @@ describe('UserDirective', () => {
 
         const div: HTMLElement = fixture.nativeElement.querySelector('#anon');
         expect(div).toBeNull();
+    });
+
+    it('user is correctly passed in directive context', () => {
+        const user = { username: 'username' };
+        mockAuthState(user);
+
+        const div: HTMLElement = fixture.nativeElement.querySelector('#authCtx');
+        const contents = div.textContent;
+        expect(contents).toBe(user.username);
     });
 });

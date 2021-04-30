@@ -16,7 +16,7 @@ export abstract class ConditionalDirective implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.authSub = this.authenticationService.getAuthenticationState().subscribe((user) => {
             if (this.shouldShow(user)) {
-                this.show();
+                this.show(user);
             } else {
                 this.hide();
             }
@@ -25,9 +25,9 @@ export abstract class ConditionalDirective implements OnInit, OnDestroy {
 
     public abstract shouldShow(user: unknown): boolean;
 
-    private show(): void {
+    private show(user: unknown): void {
         if (!this.hasView) {
-            this.viewContainer.createEmbeddedView(this.templateRef);
+            this.viewContainer.createEmbeddedView(this.templateRef, { user: user });
             this.hasView = true;
         }
     }

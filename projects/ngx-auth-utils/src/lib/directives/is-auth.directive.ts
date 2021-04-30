@@ -5,7 +5,7 @@ import { ConditionalDirective } from './conditional.directive';
 @Directive({
     selector: '[ngxAuth]',
 })
-export class UserDirective extends ConditionalDirective {
+export class IsAuthDirective extends ConditionalDirective {
     @Input()
     ngxAuth = true;
 
