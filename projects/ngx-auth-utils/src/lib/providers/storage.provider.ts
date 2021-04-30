@@ -28,3 +28,123 @@ export class MemoryStorageProvider extends StorageProvider {
         return value;
     }
 }
+
+export class LocalStorageProvider extends StorageProvider {
+    constructor() {
+        super();
+    }
+
+    clear(key: string): void {
+        localStorage.removeItem(key);
+    }
+
+    retrieve(key: string): storageValue {
+        return localStorage.getItem(key);
+    }
+
+    store(key: string, value: storageValue): storageValue {
+        if (value != null) {
+            localStorage.setItem(key, value);
+        } else {
+            localStorage.removeItem(key);
+        }
+
+        return value;
+    }
+}
+
+export class SessionStorageProvider extends StorageProvider {
+    constructor() {
+        super();
+    }
+
+    clear(key: string): void {
+        sessionStorage.removeItem(key);
+    }
+
+    retrieve(key: string): storageValue {
+        return sessionStorage.getItem(key);
+    }
+
+    store(key: string, value: storageValue): storageValue {
+        if (value != null) {
+            sessionStorage.setItem(key, value);
+        } else {
+            sessionStorage.removeItem(key);
+        }
+
+        return value;
+    }
+}
+
+export class DynamicStorageProvider extends StorageProvider {
+    private readonly STORAGE_TIMESTAMP_FIELD = 'ngx-auth-utils-storage-timestamp';
+
+    private currentStorage?: StorageProvider;
+
+    constructor() {
+        super();
+    }
+
+    public setStorage(type: 'local' | 'session' | 'memory'): void {
+        if (type === 'local') {
+            this.currentStorage = new LocalStorageProvider();
+        } else if (type === 'session') {
+            this.currentStorage = new SessionStorageProvider();
+        } else if (type === 'memory') {
+            this.currentStorage = new MemoryStorageProvider();
+        } else {
+            throw new Error('Invalid storage');
+        }
+        this.currentStorage.store(this.STORAGE_TIMESTAMP_FIELD, JSON.stringify(new Date()));
+    }
+
+    private initializeOnPreviousStorage(): void {
+        if (this.currentStorage != null) {
+            return;
+        }
+
+        const localTimestamp = this.parseStorageTimestamp(localStorage.getItem(this.STORAGE_TIMESTAMP_FIELD));
+        const sessionTimestamp = this.parseStorageTimestamp(sessionStorage.getItem(this.STORAGE_TIMESTAMP_FIELD));
+
+        if (localTimestamp != null && sessionTimestamp != null) {
+            if (localTimestamp > sessionTimestamp) {
+                this.setStorage('local');
+            } else {
+                this.setStorage('session');
+            }
+        } else if (localTimestamp != null) {
+            this.setStorage('local');
+        } else if (sessionTimestamp != null) {
+            this.setStorage('session');
+        }
+    }
+
+    private parseStorageTimestamp(value: string | null): Date | null {
+        if (value == null) {
+            return null;
+        }
+
+        return JSON.parse(value) as Date;
+    }
+
+    private getStorage(): StorageProvider {
+        if (this.currentStorage == null) {
+            throw new Error('Storage not initialized');
+        }
+        return this.currentStorage;
+    }
+
+    clear(key: string): void {
+        this.getStorage().clear(key);
+    }
+
+    retrieve(key: string): storageValue {
+        this.initializeOnPreviousStorage();
+        return this.currentStorage != null ? this.currentStorage.retrieve(key) : null;
+    }
+
+    store(key: string, value: storageValue): storageValue {
+        return this.getStorage().store(key, value);
+    }
+}
