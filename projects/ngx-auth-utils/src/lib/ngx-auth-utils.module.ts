@@ -23,7 +23,7 @@ export interface NgxAuthUtilsConfig {
 @NgModule({
     declarations: [IsAuthDirective, UserHasDirective, UserDirective],
     imports: [],
-    exports: [IsAuthDirective, UserHasDirective],
+    exports: [IsAuthDirective, UserHasDirective, UserDirective],
     providers: [
         {
             provide: HTTP_INTERCEPTORS,
