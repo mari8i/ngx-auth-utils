@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
-import { concatMap } from 'rxjs/operators';
+import { EMPTY, of, throwError } from 'rxjs';
+import { catchError, concatMap } from 'rxjs/operators';
 import { AuthenticationProvider } from '../providers/authentication.provider';
 import { MemoryStorageProvider, StorageProvider } from '../providers/storage.provider';
 
@@ -68,11 +68,17 @@ describe('AuthenticationService', () => {
 
         authProviderSpy.doLogin.and.returnValue(throwError(authError));
 
-        service.login({ foo: 'bar' }).subscribe(null, (err) => {
-            expect(err).toEqual(authError);
-            expect(service.isAuthenticated()).toBeFalsy();
-            done();
-        });
+        service
+            .login({ foo: 'bar' })
+            .pipe(
+                catchError((err) => {
+                    expect(err).toEqual(authError);
+                    expect(service.isAuthenticated()).toBeFalsy();
+                    done();
+                    return EMPTY;
+                })
+            )
+            .subscribe();
     });
 
     it('does not authenticate when credentials are valid but user could not be fetched', (done: DoneFn) => {
@@ -82,14 +88,20 @@ describe('AuthenticationService', () => {
         authProviderSpy.doLogin.and.returnValue(of(tokenPair));
         authProviderSpy.fetchUser.and.returnValue(throwError(userError));
 
-        service.login({ foo: 'bar' }).subscribe(null, (err) => {
-            expect(err).toEqual(userError);
-            expect(service.isAuthenticated()).toBeFalsy();
+        service
+            .login({ foo: 'bar' })
+            .pipe(
+                catchError((err) => {
+                    expect(err).toEqual(userError);
+                    expect(service.isAuthenticated()).toBeFalsy();
 
-            expect(storageProvider.retrieve(service.AUTH_ACCESS_TOKEN)).toBeUndefined();
-            expect(storageProvider.retrieve(service.AUTH_REFRESH_TOKEN)).toBeUndefined();
-            done();
-        });
+                    expect(storageProvider.retrieve(service.AUTH_ACCESS_TOKEN)).toBeUndefined();
+                    expect(storageProvider.retrieve(service.AUTH_REFRESH_TOKEN)).toBeUndefined();
+                    done();
+                    return EMPTY;
+                })
+            )
+            .subscribe();
     });
 
     it('caches authenticated user', (done: DoneFn) => {
