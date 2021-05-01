@@ -2,14 +2,32 @@
 
 An Angular library to ease the authentication integration with a backend.
 
-What does it provide?
+Currently supports token based authentication with optional refresh token (for JWT authentication).
+
+**What does it provide?**
 
 -   Authentication Service
 -   Route Guards
 -   Http interceptors
 -   Template directives
 
-Currently supports token based authentication with optional refresh token (for JWT authentication)
+**Is it ready to use?**
+
+The library is in a early development stage and is currently used in one single project,
+but is well-tested and all implemented features work.
+
+Feel free to try it out and suggest a feature or contribute yourself if you feel that something is wrong or missing.
+
+**Is it safe to use?**
+
+While the library itself is safe, what can lead to security problems is how you use it and
+how your authentication system works.
+
+It does not store user credentials, of course, but it does store the authentication tokens in the specified storage.
+
+Please read some token authentication security articles about the implications of storing authentication tokens in the local storage and the session storage.
+
+As usual, not storing anything is the safest choice, but usually also not the best for the user's experience.
 
 ## Installation
 
@@ -19,73 +37,141 @@ npm install -D ngx-auth-utils
 
 ## Setup
 
-Add `NgxAuthUtilsModule.forRoot(conf)` in your `app.module.ts`.
+1. Add `NgxAuthUtilsModule.forRoot(config: NgxAuthUtilsConfig)` in your `app.module.ts` NgModule imports.
 
-Here is an example:
+    ```typescript
+    NgxAuthUtilsModule.forRoot({
+        // Provide to the library your AuthenticationProvider implementation to authenticated agains your APIs.
+        authenticationProvider: {
+            provide: AuthenticationProvider,
+            useClass: MyAuthenticationProvider,
+            deps: [MyDep1, MyDep2],
+        },
 
-```typescript
-NgxAuthUtilsModule.forRoot({
-    authenticationProvider: {
-        provide: AuthenticationProvider,
-        useClass: MyAuthenticationProvider, // your AuthenticationProvider implementation
-        deps: [MyDep1, MyDep2],
-    },
-    storageProvider: {
-        provide: StorageProvider,
-        useClass: MyStorageProvider, // your StorageProvider implementation
-        deps: [MyStorageDep1],
-    },
-    homeUrl: '/',
-    noAuthRedirectUrl: '/auth/login',
-    sessionExpiredRedirectUrl: '/auth/login',
-});
-```
+        // Optional: Tells the library where to store data.
+        // Can be one of MemoryStorageProvider, LocalStorageProvider, SessionStorageProvider and DynamicStorageProvider
+        // Or your own implementaion of the StorageProvider abstract class.
+        // If not provided, defaults to MemoryStorageProvider.
+        storageProvider: {
+            provide: StorageProvider,
+            useClass: LocalStorageProvider,
+        },
 
-### Authentication provider
+        // Optional: If set, the LoginGuard redirect to this url when user is authenticated
+        homeUrl: '/',
 
-The `AuthenticationProvider` provides an interface with your authentication system the `AuthenticationService`.
+        // Optional: If set, the AuthGuard redirects to this url when user is not authenticated
+        noAuthRedirectUrl: '/auth/login',
 
-Any implementation of this class **must** implement the `fetchUser` and the `doLogin` methods.
+        // Optional: If set, the http-interceptor will redirecto to this url when session is expired
+        sessionExpiredRedirectUrl: '/auth/login',
 
-#### `doLogin(credentials: unknown): Observable<AccessTokenModel>`
+        // Optional: the header used for the authentication key. Defaults to 'Authorization'
+        authenticationHeader: 'Authorization',
 
-Attempts to login
+        // Optional: The token type.
+        // Can be one of 'Token' and 'Bearer'.
+        // Defaults to 'Bearer'
+        tokenType: 'Bearer',
+    });
+    ```
 
-```typescript
-import { AccessTokenModel, AuthenticationProvider } from 'ngx-auth-utils';
+2. Initialize the `AuthenticationService` in your root component:
 
-export class MyAuthenticationProvider extends AuthenticationProvider {
-    constructor(private myService: MyDep1, private myService2: MyDep2) {
-        super();
+    ```typescript
+    @Component({
+        selector: 'app-root',
+        templateUrl: './app.component.html',
+        styleUrls: ['./app.component.scss'],
+    })
+    export class AppComponent {
+        constructor(private authenticationService: AuthenticationService) {
+            this.authenticationService.initialize().subscribe();
+        }
+    }
+    ```
+
+    ... or in the angular `APP_INITIALIZER` in your root module:
+
+    ```typescript
+    export function initializeApp(authService: AuthenticationService) {
+        return (): Promise<void> => {
+            return new Promise<void>((resolve) => {
+                authService.initialize().subscribe();
+                resolve();
+            });
+        };
     }
 
-    fetchUser(): Observable<MyUserType> {
-        return this.myService.getUser();
-    }
+    // Add the APP_INITIALIZIER provider
+    providers: [{ provide: APP_INITIALIZER, useFactory: initializeApp, deps: [AuthenticationService], multi: true }];
+    ```
 
-    doLogin(credentials: TokenObtainPair): Observable<AccessTokenModel> {
-        return this.tokenService.tokenCreate$Json({ body: credentials }).pipe(
-            map((tokenPair: TokenLoginResponse) => {
-                return {
-                    accessToken: tokenPair.access,
-                    refreshToken: tokenPair.refresh,
-                };
-            })
-        );
-    }
+3. Provide your authentication provider implementation:
 
-    refreshToken(accessToken: string, refreshToken: string): Observable<AccessTokenModel> {
-        return this.tokenService.tokenRefreshCreate$Json({ body: { access: accessToken, refresh: refreshToken } }).pipe(
-            map((tokenPair: TokenRefreshResponse) => {
-                return {
-                    accessToken: tokenPair.access,
-                    refreshToken: refreshToken,
-                };
-            })
-        );
+    The `AuthenticationProvider` provides an interface with your authentication system the `AuthenticationService`.
+
+    Any implementation of this class **must** implement the `fetchUser` and the `doLogin` methods.
+
+    #### `doLogin(credentials: unknown): Observable<AccessTokenModel>`
+
+    Attempts to login
+
+    ```typescript
+    import { AccessTokenModel, AuthenticationProvider } from 'ngx-auth-utils';
+
+    export class MyAuthenticationProvider extends AuthenticationProvider {
+        constructor(private myService: MyDep1, private myService2: MyDep2) {
+            super();
+        }
+
+        /**
+           Mandatory: Fetch the user identity 
+         */
+        fetchUser(): Observable<MyUserType> {
+            return this.myService.getUser();
+        }
+
+        /**
+         * Mandatory: Attempts to login with the given credentials
+         * @param credentials
+         */
+        doLogin(credentials: MyCredentials): Observable<AccessTokenModel> {
+            return this.myService2.authenticate({ body: credentials }).pipe(
+                map((loginResponse: MyLoginResponse) => {
+                    return {
+                        accessToken: loginResponse.access,
+                        refreshToken: loginResponse.refresh,
+                    };
+                })
+            );
+        }
+
+        refreshToken(accessToken: string, refreshToken: string): Observable<AccessTokenModel> {
+            return this.tokenService.tokenRefreshCreate$Json({ body: { access: accessToken, refresh: refreshToken } }).pipe(
+                map((tokenPair: TokenRefreshResponse) => {
+                    return {
+                        accessToken: tokenPair.access,
+                        refreshToken: refreshToken,
+                    };
+                })
+            );
+        }
     }
-}
-```
+    ```
+
+4. Use the `AuthenticationService` to login your users!
+
+    ```typescript
+        login(): void {
+            this.authenticationService
+                .login(this.loginForm.getRawValue())
+                .subscribe((user) => {
+                    console.log('The user is logged in!', user);
+                    this.router.navigate(['/home']);
+                });
+        }
+    ```
 
 ## Docs
 
@@ -119,38 +205,182 @@ and maintains the authentication state
 -   `getAuthenticationState(): Observable<any | null>`
     Returns an observable which emits the current user if authenticated, else `null`.
 
+### Storage providers
+
+NgxAuthUtils provides 4 storage providers that the library uses to store the authentication tokens and some other data.
+
+> The buit-in providers don't suite your needs? Simply extend the StorageProvider abstract class and
+> use your class in the configuration.
+
+**MemoryStorageProvider**: Stores all data in memory. No persistence at all.
+
+**LocalStorageProvider**: Stores all data in the `localStorage`.
+
+**SessionStorageProvider**: Stores all data in the `sessionStorage`.
+
+**DynamicStorageProvider**: Let's you choose the provider at runtime, more specifically when the user logs in.
+
+This might be useful if you want to implement a "remember-me" functionality and want to store the authentication
+data either in the local or session storage based on the user's choice.
+
+Configure the library to use the `DynamicStorageProvider`:
+
+```typescript
+    storageProvider: {
+        provide: StorageProvider,
+        useClass: DynamicStorageProvider
+    }
+```
+
+In your `AuthenticationProvider` implementation, make sure that the `doLogin` function returns the storage to use:
+
+```typescript
+    doLogin(credentials: UserLoginModel): Observable<AccessTokenModel> {
+        return this.tokenService.tokenCreate$Json({ body: credentials }).pipe(
+            map((tokenPair: TokenLoginResponse) => {
+                return {
+                    accessToken: tokenPair.access,
+                    refreshToken: tokenPair.refresh,
+                    dynamicStorage: credentials.rememberMe ? 'session' : 'local'
+                };
+            })
+        );
+    }
+```
+
 ### Guards
 
 Guards can be used to protect your routes
 
 #### AuthGuard
 
+The `AuthGuard` is a `CanActivate` guard that allows routes to be loaded only if the user is authenticated.
+
+If the user is not authenticated instead:
+
+-   If the `noAuthRedirectUrl` setting has been set, it redirects to the given URL (usually, the login page)
+-   If `noAuthRedirectUrl` has not been set, it simply denies the route to be loaded.
+
+Here is an example:
+
+```typescript
+const routes: Routes = [
+    {
+        path: 'auth',
+        loadChildren: (() => import('./modules/auth/auth.module').then((m) => m.AuthModule)) as LoadChildren,
+        canActivate: [LoginGuard],
+    },
+];
+```
+
+### LoginGuard
+
+The `LoginGuard` does exactly the opposite of the `AuthGuard`. It allows the routes to be loaded only
+if the user is **not** authenticated.
+
+Use this if for example you don't want that a logged user might navigate to the login page.
+
+If the user is authenticated, the guard acts similarly to the `AuthGuard`:
+
+-   If the `homeUrl` setting has been set, it redirects to the given URL (usually, the user's homepage)
+-   If `homeUrl` has not been set, it simply denies the route to be loaded.
+
+Here is an example:
+
+```typescript
+const routes: Routes = [
+    {
+        path: 'home',
+        loadChildren: (() => import('./modules/home/home.module').then((m) => m.HomeModule)) as LoadChildren,
+        canActivate: [AuthGuard],
+    },
+];
+```
+
 ### Directives
 
 #### ngxAuth
+
+The `ngxAuth` directive is a structural directive that conditionally includes a template based on the authentication state.
 
 ```angular2html
 <div *ngxAuth>Show only if user is authenticated</div>
 <div *ngxAuth="false">Show only if not authenticated</div>
 ```
 
-#### ngxAuthHas
+The directive also exports the authenticated user, so it can be used in the template:
 
 ```angular2html
-<!--
-  Show contents only if:
-  - user is authenticated
-  - user has attribute `roles`
-  - user attribute `roles` is a list that contain any of 'FOO' and 'BAR'
--->
-<div *ngxAuthHas="'roles'; any: ['FOO', 'BAR']">Hello!</div>
-
-<!--
-
--->
-<div *ngxAuthHas="'roles'; all: ['FOO', 'BAR']">FooBar!</div>
-<div *ngxAuthHas="'name'; eq: 'foo'">FooBar!</div>
+<div *ngxAuth="true; user as u">User email is: {{ u.email }}</div>
 ```
+
+#### ngxAuthHas
+
+The `ngxAuthHas` directive, similarly to the `ngxAuth` directive, conditionally includes a template
+based on a condition over an attribute of the authenticated user.
+
+> The `ngxAuthHas` directive never includes the template if the user is not authenticated.
+
+Let's assume your user model looks like this:
+
+```typescript
+export interface User {
+    name: string;
+    email: string;
+    groups: string[];
+}
+```
+
+You can use the directive to predicate over it's attributes.
+
+```angular2html
+<div *ngxAuthHas="'roles'; any: ['FOO', 'BAR']; user as u">User {{ u.name }} is in groups FOO and BAR </div>
+```
+
+As you can see, just like the `ngxAuth` directive, the user instance is exported so it
+can be used directly in the template.
+
+**Attribute is equal**
+
+```angular2html
+<div *ngxAuthHas="'name'; eq: 'foo'">User's name is foo!</div>
+```
+
+**Attribute is not equal**
+
+```angular2html
+<div *ngxAuthHas="'name'; ne: 'foo'">User's name is NOT foo!</div>
+```
+
+**List attribute contains any value**
+
+```angular2html
+<div *ngxAuthHas="'roles'; any: ['FOO', 'BAR']">User has at least one of the the two groups</div>
+```
+
+**List attribute contains all values**
+
+```angular2html
+<div *ngxAuthHas="'roles'; all: ['FOO', 'BAR']">User is both in groups FOO and BAR</div>
+```
+
+**List attribute contains none of the values**
+
+```angular2html
+<div *ngxAuthHas="'roles'; none: ['FOO', 'BAR']">User is neither in group FOO and group BAR</div>
+```
+
+### ngxAuthUser
+
+The `ngxAuthUser` directive provides the authenticated user instance directly in your templates:
+
+```angular2html
+<div ngxAuthUser #authUser="userRef">
+    User's name is: {{ authUser.user?.name }}
+</div>
+```
+
+> If the user is not authenticated, the `user` reference of the directive will be simply `null`.
 
 ## Development
 

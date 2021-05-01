@@ -19,6 +19,9 @@ export class UserHasDirective extends ConditionalDirective {
     ngxAuthHasEq?: string;
 
     @Input()
+    ngxAuthHasNe?: string;
+
+    @Input()
     ngxAuthHasNone?: string[];
 
     constructor(authenticationService: AuthenticationService, templateRef: TemplateRef<unknown>, viewContainer: ViewContainerRef) {
@@ -50,6 +53,10 @@ export class UserHasDirective extends ConditionalDirective {
 
         if (this.ngxAuthHasEq != null) {
             return this.userHasEqValue(attrValue, this.ngxAuthHasEq);
+        }
+
+        if (this.ngxAuthHasNe != null) {
+            return !this.userHasEqValue(attrValue, this.ngxAuthHasNe);
         }
 
         throw Error('Use one of the operators: anyIn, allIn, eq');
