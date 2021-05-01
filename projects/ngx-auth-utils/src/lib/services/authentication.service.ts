@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { Observable, of, ReplaySubject, throwError } from 'rxjs';
 import { catchError, concatMap, map, shareReplay, take, tap } from 'rxjs/operators';
 import { AuthenticationProvider } from '../providers/authentication.provider';
@@ -121,5 +119,3 @@ export class AuthenticationService {
         this.authenticationState.next(this.authenticationUser);
     }
 }
-
-/* eslint-enable @typescript-eslint/no-explicit-any */
