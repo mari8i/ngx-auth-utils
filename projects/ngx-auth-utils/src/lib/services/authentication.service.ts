@@ -2,7 +2,8 @@ import { Observable, of, ReplaySubject, throwError } from 'rxjs';
 import { catchError, concatMap, map, shareReplay, take, tap } from 'rxjs/operators';
 import { AuthenticationProvider } from '../providers/authentication.provider';
 import { Injectable } from '@angular/core';
-import { StorageProvider } from '../providers/storage.provider';
+import { DynamicStorageProvider, StorageProvider } from '../providers/storage.provider';
+import { AccessTokenModel } from '../interfaces/access-token.model';
 
 @Injectable({
     providedIn: 'root',
@@ -56,7 +57,14 @@ export class AuthenticationService {
 
     public login<K>(credentials: K): Observable<any | null> {
         return this.authenticationProvider.doLogin(credentials).pipe(
-            tap((authResponse) => {
+            tap((authResponse: AccessTokenModel) => {
+                if (this.storageProvider instanceof DynamicStorageProvider) {
+                    if (!authResponse.dynamicStorage) {
+                        throw new Error('No storage type specified on login while using a dynamic storage provider');
+                    }
+                    this.storageProvider.setType(authResponse.dynamicStorage);
+                }
+
                 this.storageProvider.store(this.AUTH_ACCESS_TOKEN, authResponse.accessToken);
                 if (authResponse.refreshToken) {
                     this.storageProvider.store(this.AUTH_REFRESH_TOKEN, authResponse.refreshToken);
@@ -74,7 +82,7 @@ export class AuthenticationService {
         const refreshToken = this.getRefreshToken();
         const metadata = this.getMetadata();
         if (!accessToken) {
-            throw Error('No accesso token');
+            throw Error('No access token');
         }
         if (!refreshToken) {
             throw Error('No refresh token');

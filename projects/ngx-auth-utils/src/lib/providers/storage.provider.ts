@@ -77,16 +77,25 @@ export class SessionStorageProvider extends StorageProvider {
     }
 }
 
-export class DynamicStorageProvider extends StorageProvider {
-    private readonly STORAGE_TIMESTAMP_FIELD = 'ngx-auth-utils-storage-timestamp';
+export const STORAGE_TIMESTAMP_FIELD = 'ngx-auth-utils-storage-timestamp';
 
+export class DynamicStorageProvider extends StorageProvider {
     private currentStorage?: StorageProvider;
+    private type?: string;
 
     constructor() {
         super();
+        this.initializeOnPreviousStorage();
     }
 
-    public setStorage(type: 'local' | 'session' | 'memory'): void {
+    public getType(): string | undefined {
+        return this.type;
+    }
+
+    public setType(type: 'local' | 'session' | 'memory'): void {
+        this.type = type;
+        const prevStorage = this.currentStorage;
+
         if (type === 'local') {
             this.currentStorage = new LocalStorageProvider();
         } else if (type === 'session') {
@@ -96,7 +105,9 @@ export class DynamicStorageProvider extends StorageProvider {
         } else {
             throw new Error('Invalid storage');
         }
-        this.currentStorage.store(this.STORAGE_TIMESTAMP_FIELD, JSON.stringify(new Date()));
+
+        prevStorage?.clear(STORAGE_TIMESTAMP_FIELD);
+        this.currentStorage.store(STORAGE_TIMESTAMP_FIELD, new Date().toISOString());
     }
 
     private initializeOnPreviousStorage(): void {
@@ -104,19 +115,19 @@ export class DynamicStorageProvider extends StorageProvider {
             return;
         }
 
-        const localTimestamp = this.parseStorageTimestamp(localStorage.getItem(this.STORAGE_TIMESTAMP_FIELD));
-        const sessionTimestamp = this.parseStorageTimestamp(sessionStorage.getItem(this.STORAGE_TIMESTAMP_FIELD));
+        const localTimestamp = this.parseStorageTimestamp(localStorage.getItem(STORAGE_TIMESTAMP_FIELD));
+        const sessionTimestamp = this.parseStorageTimestamp(sessionStorage.getItem(STORAGE_TIMESTAMP_FIELD));
 
         if (localTimestamp != null && sessionTimestamp != null) {
             if (localTimestamp > sessionTimestamp) {
-                this.setStorage('local');
+                this.setType('local');
             } else {
-                this.setStorage('session');
+                this.setType('session');
             }
         } else if (localTimestamp != null) {
-            this.setStorage('local');
+            this.setType('local');
         } else if (sessionTimestamp != null) {
-            this.setStorage('session');
+            this.setType('session');
         }
     }
 
@@ -125,7 +136,7 @@ export class DynamicStorageProvider extends StorageProvider {
             return null;
         }
 
-        return JSON.parse(value) as Date;
+        return new Date(value);
     }
 
     private getStorage(): StorageProvider {
@@ -140,7 +151,6 @@ export class DynamicStorageProvider extends StorageProvider {
     }
 
     retrieve(key: string): storageValue {
-        this.initializeOnPreviousStorage();
         return this.currentStorage != null ? this.currentStorage.retrieve(key) : null;
     }
 
