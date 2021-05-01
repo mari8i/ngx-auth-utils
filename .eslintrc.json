@@ -38,7 +38,8 @@
                     }
                 ],
                 "no-debugger": ["error"],
-                "no-console": ["error", { "allow": ["error"] }]
+                "no-console": ["error", { "allow": ["error"] }],
+                "@typescript-eslint/no-explicit-any": ["off"]
             }
         },
         {

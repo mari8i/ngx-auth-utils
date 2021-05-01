@@ -9,9 +9,9 @@ import { AuthenticationService } from '../services/authentication.service';
 export class UserDirective implements OnInit, OnDestroy {
     private authSub?: Subscription;
 
-    private authUser?: unknown;
+    private authUser?: any | null;
 
-    public get user(): unknown {
+    public get user(): any | null {
         return this.authUser;
     }
 
