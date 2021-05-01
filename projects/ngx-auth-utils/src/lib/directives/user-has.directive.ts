@@ -18,6 +18,9 @@ export class UserHasDirective extends ConditionalDirective {
     @Input()
     ngxAuthHasEq?: string;
 
+    @Input()
+    ngxAuthHasNone?: string[];
+
     constructor(authenticationService: AuthenticationService, templateRef: TemplateRef<unknown>, viewContainer: ViewContainerRef) {
         super(authenticationService, templateRef, viewContainer);
     }
@@ -36,8 +39,13 @@ export class UserHasDirective extends ConditionalDirective {
         if (this.ngxAuthHasAny != null) {
             return this.userHasAnyValues(attrValue as unknown[], this.ngxAuthHasAny);
         }
+
         if (this.ngxAuthHasAll != null) {
             return this.userHasAllValues(attrValue as unknown[], this.ngxAuthHasAll);
+        }
+
+        if (this.ngxAuthHasNone != null) {
+            return !this.userHasAnyValues(attrValue as unknown[], this.ngxAuthHasNone);
         }
 
         if (this.ngxAuthHasEq != null) {
