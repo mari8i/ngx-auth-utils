@@ -13,8 +13,10 @@ Currently supports token based authentication with optional refresh token (for J
 
 **Is it ready to use?**
 
-The library is in a early development stage and is currently used in one single project,
+The library is in an early development stage and is currently used in one single project,
 but is well-tested and all implemented features work.
+
+_Please keep in mind that it might still change a lot._
 
 Feel free to try it out and suggest a feature or contribute yourself if you feel that something is wrong or missing.
 
@@ -382,7 +384,7 @@ The `ngxAuthUser` directive provides the authenticated user instance directly in
 
 > If the user is not authenticated, the `user` reference of the directive will be simply `null`.
 
-## Development
+## Development & Contribution
 
 Setup the project:
 
@@ -390,3 +392,6 @@ Setup the project:
    npm install
    npm run prepare
 ```
+
+If you want to contribute, please contact me before so we can discuss about it.
+Then simply do your modifications, add tests to them, and simply submit a change request.
