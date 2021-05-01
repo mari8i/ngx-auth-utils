@@ -336,7 +336,7 @@ export interface User {
 You can use the directive to predicate over it's attributes.
 
 ```angular2html
-<div *ngxAuthHas="'roles'; any: ['FOO', 'BAR']; user as u">User {{ u.name }} is in groups FOO and BAR </div>
+<div *ngxAuthHas="'groups'; any: ['FOO', 'BAR']; user as u">User {{ u.name }} is in groups FOO and BAR </div>
 ```
 
 As you can see, just like the `ngxAuth` directive, the user instance is exported so it
@@ -357,19 +357,19 @@ can be used directly in the template.
 **List attribute contains any value**
 
 ```angular2html
-<div *ngxAuthHas="'roles'; any: ['FOO', 'BAR']">User has at least one of the the two groups</div>
+<div *ngxAuthHas="'groups'; any: ['FOO', 'BAR']">User has at least one of the the two groups</div>
 ```
 
 **List attribute contains all values**
 
 ```angular2html
-<div *ngxAuthHas="'roles'; all: ['FOO', 'BAR']">User is both in groups FOO and BAR</div>
+<div *ngxAuthHas="'groups'; all: ['FOO', 'BAR']">User is both in groups FOO and BAR</div>
 ```
 
 **List attribute contains none of the values**
 
 ```angular2html
-<div *ngxAuthHas="'roles'; none: ['FOO', 'BAR']">User is neither in group FOO and group BAR</div>
+<div *ngxAuthHas="'groups'; none: ['FOO', 'BAR']">User is neither in group FOO and group BAR</div>
 ```
 
 ### ngxAuthUser
