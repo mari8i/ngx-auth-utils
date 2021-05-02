@@ -3,7 +3,7 @@ import { catchError, concatMap, map, shareReplay, take, tap } from 'rxjs/operato
 import { AuthenticationProvider } from '../providers/authentication.provider';
 import { Injectable } from '@angular/core';
 import { DynamicStorageProvider, StorageProvider } from '../providers/storage.provider';
-import { AccessTokenModel } from '../interfaces/access-token.model';
+import { AccessTokenModel } from '../interfaces';
 
 @Injectable({
     providedIn: 'root',

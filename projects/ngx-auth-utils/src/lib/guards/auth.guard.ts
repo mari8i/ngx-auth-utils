@@ -5,6 +5,7 @@ import { AuthenticationService } from '../services/authentication.service';
 import { NO_AUTH_REDIRECT_URL } from '../config';
 import { Observable } from 'rxjs';
 
+// TODO: tests && canActivateChild && canLoad && canLoadChild
 @Injectable({
     providedIn: 'root',
 })

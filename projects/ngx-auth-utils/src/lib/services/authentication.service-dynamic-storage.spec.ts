@@ -5,7 +5,7 @@ import { AuthenticationProvider } from '../providers/authentication.provider';
 import { DynamicStorageProvider, StorageProvider } from '../providers/storage.provider';
 
 import { AuthenticationService } from './authentication.service';
-import { AccessTokenModel } from '../interfaces/access-token.model';
+import { AccessTokenModel } from '../interfaces';
 
 describe('AuthenticationServiceWithDynamicStorage', () => {
     let service: AuthenticationService;
