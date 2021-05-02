@@ -1,16 +1,21 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { map, take } from 'rxjs/operators';
 import { UserConditions } from '../utils/user-conditions';
 import { AuthUserPredicates } from '../interfaces';
+import { GLOBAL_USER_CONDITION_REDIRECT_URL } from '../config';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthUserPredicateGuard implements CanActivate {
-    constructor(private authenticationService: AuthenticationService, private router: Router) {}
+    constructor(
+        private authenticationService: AuthenticationService,
+        private router: Router,
+        @Inject(GLOBAL_USER_CONDITION_REDIRECT_URL) private globalRedirectUrl?: string
+    ) {}
 
     /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
@@ -21,7 +26,16 @@ export class AuthUserPredicateGuard implements CanActivate {
                     return true;
                 }
 
-                // TODO: Redirect
+                const localRedirectRoute = route?.data?.authUserPredicate?.redirectRoute;
+                if (localRedirectRoute !== false) {
+                    if (localRedirectRoute != null) {
+                        return this.router.parseUrl(localRedirectRoute);
+                    }
+
+                    if (this.globalRedirectUrl) {
+                        return this.router.parseUrl(this.globalRedirectUrl);
+                    }
+                }
 
                 return false;
             })

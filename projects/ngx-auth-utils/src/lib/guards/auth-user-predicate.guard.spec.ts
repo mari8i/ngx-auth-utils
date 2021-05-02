@@ -1,5 +1,5 @@
 import { AuthUserPredicateGuard } from './auth-user-predicate.guard';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { EMPTY, Observable, of } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { catchError } from 'rxjs/operators';
@@ -25,7 +25,7 @@ describe('AuthUserPredicateGuard', () => {
     }
 
     beforeEach(() => {
-        routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
+        routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate', 'parseUrl']);
         serviceStub = {};
         guard = new AuthUserPredicateGuard(serviceStub as AuthenticationService, routerSpy);
     });
@@ -96,6 +96,63 @@ describe('AuthUserPredicateGuard', () => {
         it('Resolves to false', (done: DoneFn) => {
             guard.canActivate(dummyRoute, fakeState).subscribe((result) => {
                 expect(result).toBeFalse();
+                done();
+            });
+        });
+
+        it('Redirects to global redirect route if set', (done: DoneFn) => {
+            const dummyUrlTree: UrlTree = new UrlTree();
+            routerSpy.parseUrl.and.returnValue(dummyUrlTree);
+            guard = new AuthUserPredicateGuard(serviceStub as AuthenticationService, routerSpy, '/test-error');
+
+            guard.canActivate(dummyRoute, fakeState).subscribe((url) => {
+                expect(url).toBeInstanceOf(UrlTree);
+                expect(url).toEqual(dummyUrlTree);
+                expect(routerSpy.parseUrl.calls.mostRecent().args).toEqual(['/test-error']);
+                done();
+            });
+        });
+
+        it('Redirects to local redirect route if set', (done: DoneFn) => {
+            dummyRoute = createRouteSnapshotData({ condition: 'eq', value: 'bye', attribute: 'foo', redirectRoute: '/local-error' });
+
+            const dummyUrlTree: UrlTree = new UrlTree();
+            routerSpy.parseUrl.and.returnValue(dummyUrlTree);
+            guard = new AuthUserPredicateGuard(serviceStub as AuthenticationService, routerSpy);
+
+            guard.canActivate(dummyRoute, fakeState).subscribe((url) => {
+                expect(url).toBeInstanceOf(UrlTree);
+                expect(url).toEqual(dummyUrlTree);
+                expect(routerSpy.parseUrl.calls.mostRecent().args).toEqual(['/local-error']);
+                done();
+            });
+        });
+
+        it('Redirects to local redirect route if set and global set too', (done: DoneFn) => {
+            dummyRoute = createRouteSnapshotData({ condition: 'eq', value: 'bye', attribute: 'foo', redirectRoute: '/local-error' });
+
+            const dummyUrlTree: UrlTree = new UrlTree();
+            routerSpy.parseUrl.and.returnValue(dummyUrlTree);
+            guard = new AuthUserPredicateGuard(serviceStub as AuthenticationService, routerSpy, '/test-error');
+
+            guard.canActivate(dummyRoute, fakeState).subscribe((url) => {
+                expect(url).toBeInstanceOf(UrlTree);
+                expect(url).toEqual(dummyUrlTree);
+                expect(routerSpy.parseUrl.calls.mostRecent().args).toEqual(['/local-error']);
+                done();
+            });
+        });
+
+        it('Does not redirect if global is set but local is false', (done: DoneFn) => {
+            dummyRoute = createRouteSnapshotData({ condition: 'eq', value: 'bye', attribute: 'foo', redirectRoute: false });
+
+            const dummyUrlTree: UrlTree = new UrlTree();
+            routerSpy.parseUrl.and.returnValue(dummyUrlTree);
+            guard = new AuthUserPredicateGuard(serviceStub as AuthenticationService, routerSpy, '/test-error');
+
+            guard.canActivate(dummyRoute, fakeState).subscribe((resolve) => {
+                expect(resolve).toBeFalse();
+                expect(routerSpy.parseUrl.calls.count()).toEqual(0);
                 done();
             });
         });
