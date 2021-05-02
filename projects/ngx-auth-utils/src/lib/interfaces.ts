@@ -9,4 +9,5 @@ export interface AuthUserPredicates {
     condition: 'eq' | 'ne' | 'any' | 'all' | 'none';
     attribute: string;
     value: any;
+    redirectRoute?: string | false;
 }
