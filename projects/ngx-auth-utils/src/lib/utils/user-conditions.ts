@@ -1,14 +1,17 @@
 export class UserConditions {
     public static hasAllValues(userValues: unknown[], values: unknown[]): boolean {
-        return values.every((v) => userValues.includes(v));
+        const res: boolean = values.every((v) => userValues.includes(v));
+        return res;
     }
 
     public static hasAnyValues(userValues: unknown[], values: unknown[]): boolean {
-        return userValues.some((uv) => values.includes(uv));
+        const res: boolean = userValues.some((uv) => values.includes(uv));
+        return res;
     }
 
     public static hasNoneOfTheValues(userValues: unknown[], values: unknown[]): boolean {
-        return !this.hasAnyValues(userValues, values);
+        const res = !this.hasAnyValues(userValues, values);
+        return res;
     }
 
     public static hasEqValue(userValue: unknown, value: unknown): boolean {
