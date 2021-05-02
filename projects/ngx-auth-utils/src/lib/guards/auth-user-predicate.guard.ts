@@ -19,30 +19,40 @@ export class AuthUserPredicateGuard implements CanActivate {
 
     /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
-        return this.authenticationService.getAuthenticationState().pipe(
-            take(1),
-            map((user) => {
-                if (user != null && this.checkConditions(user, route.data?.authUserPredicate)) {
-                    return true;
+        return this.checkConditionsAndRedirect(route);
+    }
+
+    private checkConditionsAndRedirect(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> {
+        return this.checkConditions(route).pipe(
+            map((result) => {
+                if (!result) {
+                    const localRedirectRoute = route?.data?.authUserPredicate?.redirectRoute;
+                    if (localRedirectRoute !== false) {
+                        if (localRedirectRoute != null) {
+                            return this.router.parseUrl(localRedirectRoute);
+                        }
+
+                        if (this.globalRedirectUrl) {
+                            return this.router.parseUrl(this.globalRedirectUrl);
+                        }
+                    }
                 }
 
-                const localRedirectRoute = route?.data?.authUserPredicate?.redirectRoute;
-                if (localRedirectRoute !== false) {
-                    if (localRedirectRoute != null) {
-                        return this.router.parseUrl(localRedirectRoute);
-                    }
-
-                    if (this.globalRedirectUrl) {
-                        return this.router.parseUrl(this.globalRedirectUrl);
-                    }
-                }
-
-                return false;
+                return result;
             })
         );
     }
 
-    private checkConditions(user: any, unsafePredicates?: AuthUserPredicates): boolean {
+    private checkConditions(route: ActivatedRouteSnapshot): Observable<boolean> {
+        return this.authenticationService.getAuthenticationState().pipe(
+            take(1),
+            map((user) => {
+                return user != null && this.checkPredicatesAgainstUser(user, route.data?.authUserPredicate);
+            })
+        );
+    }
+
+    private checkPredicatesAgainstUser(user: any, unsafePredicates?: AuthUserPredicates): boolean {
         const predicates = this.validatePredicates(unsafePredicates);
 
         if (!(predicates.attribute in user)) {
