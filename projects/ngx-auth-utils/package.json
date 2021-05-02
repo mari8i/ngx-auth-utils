@@ -9,5 +9,6 @@
         "tslib": "^2.0.0"
     },
     "repository": "github:mari8i/ngx-auth-utils",
-    "homepage": "https://github.com/mari8i/ngx-auth-utils"
+    "homepage": "https://github.com/mari8i/ngx-auth-utils",
+    "license": "Apache-2.0"
 }
