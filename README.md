@@ -256,7 +256,7 @@ Guards can be used to protect your routes
 
 #### AuthGuard
 
-The `AuthGuard` is a `CanActivate` guard that allows routes to be loaded only if the user is authenticated.
+The `AuthGuard` is a `CanActivate`, `CanActivateChild` and `CanLoad` guard that allows routes to be loaded only if the user is authenticated.
 
 If the user is not authenticated instead:
 
@@ -270,7 +270,7 @@ const routes: Routes = [
     {
         path: 'auth',
         loadChildren: (() => import('./modules/auth/auth.module').then((m) => m.AuthModule)) as LoadChildren,
-        canActivate: [LoginGuard],
+        canLoad: [LoginGuard],
     },
 ];
 ```
@@ -295,6 +295,30 @@ const routes: Routes = [
         path: 'home',
         loadChildren: (() => import('./modules/home/home.module').then((m) => m.HomeModule)) as LoadChildren,
         canActivate: [AuthGuard],
+    },
+];
+```
+
+### AuthUserPredicateGuard
+
+The `AuthUserPredicateGuard` checks that the given predicate complies with the authenticated user.
+
+-   TODO: Some more docs
+
+Here is an example:
+
+```typescript
+const routes: Routes = [
+    {
+        path: 'home',
+        canActivate: [AuthUserPredicateGuard],
+        data: {
+            authUserPredicate: {
+                condition: 'eq',
+                attribute: 'email',
+                value: 'foo@bar.com',
+            },
+        },
     },
 ];
 ```

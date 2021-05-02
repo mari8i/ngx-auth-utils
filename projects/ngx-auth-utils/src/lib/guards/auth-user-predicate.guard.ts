@@ -1,5 +1,15 @@
 import { Inject, Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import {
+    ActivatedRouteSnapshot,
+    CanActivate,
+    CanActivateChild,
+    CanLoad,
+    Route,
+    Router,
+    RouterStateSnapshot,
+    UrlSegment,
+    UrlTree,
+} from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { map, take } from 'rxjs/operators';
@@ -10,12 +20,22 @@ import { GLOBAL_USER_CONDITION_REDIRECT_URL } from '../config';
 @Injectable({
     providedIn: 'root',
 })
-export class AuthUserPredicateGuard implements CanActivate {
+export class AuthUserPredicateGuard implements CanActivate, CanActivateChild, CanLoad {
     constructor(
         private authenticationService: AuthenticationService,
         private router: Router,
         @Inject(GLOBAL_USER_CONDITION_REDIRECT_URL) private globalRedirectUrl?: string
     ) {}
+
+    /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
+    canLoad(route: Route, segments: UrlSegment[]): Observable<boolean | UrlTree> {
+        return this.checkConditions(route);
+    }
+
+    /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
+    canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
+        return this.checkConditionsAndRedirect(childRoute);
+    }
 
     /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
@@ -43,7 +63,7 @@ export class AuthUserPredicateGuard implements CanActivate {
         );
     }
 
-    private checkConditions(route: ActivatedRouteSnapshot): Observable<boolean> {
+    private checkConditions(route: ActivatedRouteSnapshot | Route): Observable<boolean> {
         return this.authenticationService.getAuthenticationState().pipe(
             take(1),
             map((user) => {
