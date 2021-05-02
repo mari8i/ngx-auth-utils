@@ -395,3 +395,7 @@ Setup the project:
 
 If you want to contribute, please contact me before so we can discuss about it.
 Then simply do your modifications, add tests to them, and simply submit a change request.
+
+### IDEAS & TODOs:
+
+-   Centralize events in a service that can be subscribed (on login, on logout, on auth expired, ...)
