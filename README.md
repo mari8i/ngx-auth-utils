@@ -59,10 +59,10 @@ npm install -D ngx-auth-utils
             useClass: LocalStorageProvider,
         },
 
-        // Optional: If set, the LoginGuard redirect to this url when user is authenticated
+        // Optional: If set, the AnonUserGuard redirect to this url when user is authenticated
         homeUrl: '/',
 
-        // Optional: If set, the AuthGuard redirects to this url when user is not authenticated
+        // Optional: If set, the AuthUserGuard redirects to this url when user is not authenticated
         noAuthRedirectUrl: '/auth/login',
 
         // Optional: If set, the http-interceptor will redirecto to this url when session is expired
@@ -254,9 +254,9 @@ In your `AuthenticationProvider` implementation, make sure that the `doLogin` fu
 
 Guards can be used to protect your routes
 
-#### AuthGuard
+#### AuthUserGuard
 
-The `AuthGuard` is a `CanActivate`, `CanActivateChild` and `CanLoad` guard that allows routes to be loaded only if the user is authenticated.
+The `AuthUserGuard` is a `CanActivate`, `CanActivateChild` and `CanLoad` guard that allows routes to be loaded only if the user is authenticated.
 
 If the user is not authenticated instead:
 
@@ -270,19 +270,19 @@ const routes: Routes = [
     {
         path: 'auth',
         loadChildren: (() => import('./modules/auth/auth.module').then((m) => m.AuthModule)) as LoadChildren,
-        canLoad: [LoginGuard],
+        canLoad: [AnonUserGuard],
     },
 ];
 ```
 
-### LoginGuard
+### AnonUserGuard
 
-The `LoginGuard` does exactly the opposite of the `AuthGuard`. It allows the routes to be loaded only
+The `AnonUserGuard` does exactly the opposite of the `AuthUserGuard`. It allows the routes to be loaded only
 if the user is **not** authenticated.
 
 Use this if for example you don't want that a logged user might navigate to the login page.
 
-If the user is authenticated, the guard acts similarly to the `AuthGuard`:
+If the user is authenticated, the guard acts similarly to the `AuthUserGuard`:
 
 -   If the `homeUrl` setting has been set, it redirects to the given URL (usually, the user's homepage)
 -   If `homeUrl` has not been set, it simply denies the route to be loaded.
@@ -294,7 +294,7 @@ const routes: Routes = [
     {
         path: 'home',
         loadChildren: (() => import('./modules/home/home.module').then((m) => m.HomeModule)) as LoadChildren,
-        canActivate: [AuthGuard],
+        canActivate: [AuthUserGuard],
     },
 ];
 ```

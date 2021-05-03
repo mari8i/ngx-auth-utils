@@ -1,22 +1,22 @@
 import { Router, UrlTree } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
-import { AuthGuard } from './auth.guard';
+import { AuthUserGuard } from './auth-user.guard';
 
 describe('AuthUserPredicateGuard', () => {
-    let guard: AuthGuard;
+    let guard: AuthUserGuard;
     let routerSpy: jasmine.SpyObj<Router>;
     const serviceStub: Partial<AuthenticationService> = {};
 
     describe('Unauthenticated, without redirect', () => {
         beforeEach(() => {
             routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate', 'parseUrl']);
-            guard = new AuthGuard(serviceStub as AuthenticationService, routerSpy, undefined);
+            guard = new AuthUserGuard(serviceStub as AuthenticationService, routerSpy, undefined);
             serviceStub.getAuthenticationState = (): Observable<any> => of(null);
         });
 
         it('emits false when user is not authenticated', (done: DoneFn) => {
-            guard.canActivate().subscribe((res) => {
+            guard.canActivate().subscribe((res: UrlTree | boolean) => {
                 expect(res).toBeFalse();
                 done();
             });
@@ -26,7 +26,7 @@ describe('AuthUserPredicateGuard', () => {
     describe('Unauthenticated, with redirect', () => {
         beforeEach(() => {
             routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate', 'parseUrl']);
-            guard = new AuthGuard(serviceStub as AuthenticationService, routerSpy, '/error');
+            guard = new AuthUserGuard(serviceStub as AuthenticationService, routerSpy, '/error');
             serviceStub.getAuthenticationState = (): Observable<any> => of(null);
         });
 
@@ -34,7 +34,7 @@ describe('AuthUserPredicateGuard', () => {
             const dummyUrlTree: UrlTree = new UrlTree();
             routerSpy.parseUrl.and.returnValue(dummyUrlTree);
 
-            guard.canActivate().subscribe((url) => {
+            guard.canActivate().subscribe((url: UrlTree | boolean) => {
                 expect(url).toBeInstanceOf(UrlTree);
                 expect(url).toEqual(dummyUrlTree);
                 expect(routerSpy.parseUrl.calls.mostRecent().args).toEqual(['/error']);
@@ -46,7 +46,7 @@ describe('AuthUserPredicateGuard', () => {
     describe('Authenticated', () => {
         beforeEach(() => {
             routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate', 'parseUrl']);
-            guard = new AuthGuard(serviceStub as AuthenticationService, routerSpy, undefined);
+            guard = new AuthUserGuard(serviceStub as AuthenticationService, routerSpy, undefined);
             serviceStub.getAuthenticationState = (): Observable<any> => of({ username: 'foo' });
         });
 
@@ -54,7 +54,7 @@ describe('AuthUserPredicateGuard', () => {
             const dummyUrlTree: UrlTree = new UrlTree();
             routerSpy.parseUrl.and.returnValue(dummyUrlTree);
 
-            guard.canActivate().subscribe((res) => {
+            guard.canActivate().subscribe((res: UrlTree | boolean) => {
                 expect(res).toBeTrue();
                 done();
             });
