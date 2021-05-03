@@ -5,11 +5,10 @@ import { AuthenticationService } from '../services/authentication.service';
 import { HOME_URL } from '../config';
 import { Observable } from 'rxjs';
 
-// TODO: Rename
 @Injectable({
     providedIn: 'root',
 })
-export class LoginGuard implements CanActivate {
+export class AnonUserGuard implements CanActivate {
     constructor(private authenticationService: AuthenticationService, private router: Router, @Inject(HOME_URL) private homeUrl: string) {}
 
     canActivate(): Observable<boolean | UrlTree> {
