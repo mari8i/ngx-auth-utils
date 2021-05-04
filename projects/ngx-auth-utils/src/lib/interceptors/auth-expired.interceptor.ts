@@ -57,7 +57,8 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
     }
 
     private handle401Failure(): void {
-        this.authenticationService.logout();
+        this.authenticationService.sessionExpired();
+
         if (this.sessionExpiredRedirectUrl != null) {
             this.router.navigate([this.sessionExpiredRedirectUrl]);
         }

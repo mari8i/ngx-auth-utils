@@ -1,3 +1,7 @@
+export type AuthenticationEventType = 'login' | 'login-failed' | 'logout' | 'session-expired' | 'initialized';
+
+export type UserType = any | null;
+
 export interface AccessTokenModel {
     accessToken: string;
     refreshToken?: string;
@@ -10,4 +14,16 @@ export interface AuthUserPredicates {
     attribute: string;
     value: any;
     redirectRoute?: string | false;
+}
+
+export class AuthenticationEvent {
+    public get type(): AuthenticationEventType {
+        return this._user;
+    }
+
+    public get user(): UserType {
+        return this._user;
+    }
+
+    constructor(private _type: AuthenticationEventType, private _user: UserType) {}
 }

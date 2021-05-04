@@ -1,45 +1,50 @@
-import { Observable, of, ReplaySubject, throwError } from 'rxjs';
+import { Observable, of, ReplaySubject, Subject, throwError } from 'rxjs';
 import { catchError, concatMap, map, shareReplay, take, tap } from 'rxjs/operators';
 import { AuthenticationProvider } from '../providers/authentication.provider';
 import { Injectable } from '@angular/core';
 import { DynamicStorageProvider, StorageProvider } from '../providers/storage.provider';
-import { AccessTokenModel } from '../interfaces';
+import { AccessTokenModel, AuthenticationEvent, UserType } from '../interfaces';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthenticationService {
-    private authenticationUser: any | null = null;
-    private authenticationState = new ReplaySubject<any | null>(1);
-    private authenticatedUserCache?: Observable<any | null>;
+    private authenticationUser: UserType = null;
+    private authenticationState$ = new ReplaySubject<UserType>(1);
+    private authenticatedUserCache?: Observable<UserType>;
+    private events$ = new Subject<AuthenticationEvent>();
 
     public readonly AUTH_ACCESS_TOKEN = 'ngx-auth-access-token';
     public readonly AUTH_REFRESH_TOKEN = 'ngx-auth-refresh-token';
     public readonly AUTH_METADATA = 'ngx-auth-metadata';
 
+    public get state(): Observable<any | null> {
+        return this.authenticationState$.asObservable();
+    }
+
+    public get events(): Observable<AuthenticationEvent> {
+        return this.events$.asObservable();
+    }
+
     constructor(private storageProvider: StorageProvider, public authenticationProvider: AuthenticationProvider) {}
 
-    public getAuthenticationState(): Observable<any | null> {
-        return this.authenticationState.asObservable();
+    public getAuthenticationState(): Observable<UserType> {
+        return this.authenticationState$.asObservable();
+    }
+
+    public getAuthenticationEvents(): Observable<AuthenticationEvent> {
+        return this.events$.asObservable();
     }
 
     public isAuthenticated(): boolean {
         return this.authenticationUser !== null;
     }
 
-    public initialize(): Observable<any | null> {
-        if (this.getAccessToken() != null) {
-            return this.getAuthenticatedUser(true).pipe(
-                take(1),
-                catchError(() => of(null))
-            );
-        }
-
-        this.authenticate(null);
-        return of(null);
+    public initialize(): Observable<UserType> {
+        return this.doInitialize().pipe(tap((user) => this.events$.next(new AuthenticationEvent('initialized', user))));
     }
 
-    public getAuthenticatedUser(force?: boolean): Observable<any | null> {
+    public getAuthenticatedUser(force?: boolean): Observable<UserType> {
         if (!this.authenticatedUserCache || force || !this.isAuthenticated()) {
             this.authenticatedUserCache = this.authenticationProvider.fetchUser().pipe(
                 catchError((error) => {
@@ -55,7 +60,7 @@ export class AuthenticationService {
         return this.authenticatedUserCache;
     }
 
-    public login<K>(credentials: K): Observable<any | null> {
+    public login<K>(credentials: K): Observable<UserType> {
         return this.authenticationProvider.doLogin(credentials).pipe(
             tap((authResponse: AccessTokenModel) => {
                 if (this.storageProvider instanceof DynamicStorageProvider) {
@@ -73,7 +78,12 @@ export class AuthenticationService {
                     this.storageProvider.store(this.AUTH_METADATA, JSON.stringify(authResponse.metadata));
                 }
             }),
-            concatMap(() => this.getAuthenticatedUser(true))
+            concatMap(() => this.getAuthenticatedUser(true)),
+            catchError((error) => {
+                this.events$.next(new AuthenticationEvent('login-failed', null));
+                return throwError(error);
+            }),
+            tap((user) => this.events$.next(new AuthenticationEvent('login', user)))
         );
     }
 
@@ -97,15 +107,16 @@ export class AuthenticationService {
         );
     }
 
-    public getAccessToken(): string | null {
+    // TODO: Improve: can we avoid to expose these methods to the public?
+    getAccessToken(): string | null {
         return this.storageProvider.retrieve(this.AUTH_ACCESS_TOKEN);
     }
 
-    public getRefreshToken(): string | null {
+    getRefreshToken(): string | null {
         return this.storageProvider.retrieve(this.AUTH_REFRESH_TOKEN);
     }
 
-    public getMetadata(): any | null {
+    private getMetadata(): any | null {
         const meta = this.storageProvider.retrieve(this.AUTH_METADATA);
         if (meta) {
             return JSON.parse(meta);
@@ -113,17 +124,41 @@ export class AuthenticationService {
         return null;
     }
 
+    // TODO: Improve: can we avoid to expose these methods to the public?
+    sessionExpired(): void {
+        const user = this.authenticationUser;
+        this.doLogout();
+        this.events$.next(new AuthenticationEvent('session-expired', user));
+    }
+
     public logout(): void {
         // TODO: Server logout
+        const user = this.authenticationUser;
+        this.doLogout();
+        this.events$.next(new AuthenticationEvent('logout', user));
+    }
 
-        // Removing the token stored in identity service and into the local storage.
+    private doLogout(): void {
         this.authenticate(null);
         this.storageProvider.clear(this.AUTH_ACCESS_TOKEN);
         this.storageProvider.clear(this.AUTH_REFRESH_TOKEN);
+        this.storageProvider.clear(this.AUTH_METADATA);
     }
 
-    private authenticate(identity: any | null): void {
+    private authenticate(identity: UserType): void {
         this.authenticationUser = identity;
-        this.authenticationState.next(this.authenticationUser);
+        this.authenticationState$.next(this.authenticationUser);
+    }
+
+    private doInitialize(): Observable<UserType> {
+        if (this.getAccessToken() != null) {
+            return this.getAuthenticatedUser(true).pipe(
+                take(1),
+                catchError(() => of(null))
+            );
+        }
+
+        this.authenticate(null);
+        return of(null);
     }
 }
