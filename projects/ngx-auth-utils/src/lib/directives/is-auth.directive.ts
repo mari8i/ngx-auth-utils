@@ -1,6 +1,7 @@
 import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
 import { ConditionalDirective } from './conditional.directive';
+import { UserType } from '../interfaces';
 
 @Directive({
     selector: '[ngxAuth]',
@@ -13,7 +14,7 @@ export class IsAuthDirective extends ConditionalDirective {
         super(authenticationService, templateRef, viewContainer);
     }
 
-    shouldShow(user: unknown): boolean {
+    shouldShow(user: UserType): boolean {
         return !!user === this.ngxAuth;
     }
 }
