@@ -18,7 +18,7 @@ export class AuthenticationService {
     public readonly AUTH_REFRESH_TOKEN = 'ngx-auth-refresh-token';
     public readonly AUTH_METADATA = 'ngx-auth-metadata';
 
-    public get state(): Observable<any | null> {
+    public get state(): Observable<UserType> {
         return this.authenticationState$.asObservable();
     }
 
