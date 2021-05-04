@@ -1,6 +1,7 @@
 import { Directive, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
+import { UserType } from '../interfaces';
 
 @Directive({
     selector: '[ngxAuthUser]',
@@ -9,9 +10,9 @@ import { AuthenticationService } from '../services/authentication.service';
 export class UserDirective implements OnInit, OnDestroy {
     private authSub?: Subscription;
 
-    private authUser?: any | null;
+    private authUser: UserType = null;
 
-    public get user(): any | null {
+    public get user(): UserType {
         return this.authUser;
     }
 

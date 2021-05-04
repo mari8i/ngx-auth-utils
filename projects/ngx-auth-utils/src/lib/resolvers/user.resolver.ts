@@ -3,6 +3,7 @@ import { Resolve } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { take } from 'rxjs/operators';
+import { UserType } from '../interfaces';
 
 @Injectable({
     providedIn: 'root',
@@ -10,7 +11,7 @@ import { take } from 'rxjs/operators';
 export class UserResolver implements Resolve<unknown> {
     constructor(private authenticationService: AuthenticationService) {}
 
-    resolve(): Observable<unknown> {
+    resolve(): Observable<UserType> {
         return this.authenticationService.getAuthenticationState().pipe(take(1));
     }
 }

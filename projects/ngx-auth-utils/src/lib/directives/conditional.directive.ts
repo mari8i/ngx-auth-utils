@@ -1,6 +1,7 @@
 import { OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
 import { Subscription } from 'rxjs';
+import { UserType } from '../interfaces';
 
 export abstract class ConditionalDirective implements OnInit, OnDestroy {
     private hasView = false;
@@ -23,9 +24,9 @@ export abstract class ConditionalDirective implements OnInit, OnDestroy {
         });
     }
 
-    public abstract shouldShow(user: unknown): boolean;
+    public abstract shouldShow(user: UserType): boolean;
 
-    private show(user: unknown): void {
+    private show(user: UserType): void {
         if (!this.hasView) {
             this.viewContainer.createEmbeddedView(this.templateRef, { user: user });
             this.hasView = true;

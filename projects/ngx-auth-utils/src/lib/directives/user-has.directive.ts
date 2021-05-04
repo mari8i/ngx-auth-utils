@@ -2,6 +2,7 @@ import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
 import { ConditionalDirective } from './conditional.directive';
 import { UserConditions } from '../utils/user-conditions';
+import { AuthUserType, UserType } from '../interfaces';
 
 @Directive({
     selector: '[ngxAuthHas]',
@@ -29,11 +30,11 @@ export class UserHasDirective extends ConditionalDirective {
         super(authenticationService, templateRef, viewContainer);
     }
 
-    shouldShow(user: { [key: string]: unknown }): boolean {
+    shouldShow(user: UserType): boolean {
         return user != null && this.checkConditions(user);
     }
 
-    private checkConditions(user: { [key: string]: unknown }): boolean {
+    private checkConditions(user: AuthUserType): boolean {
         const attrValue: unknown = user[this.ngxAuthHas];
 
         if (attrValue === undefined) {

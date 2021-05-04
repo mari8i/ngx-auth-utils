@@ -1,5 +1,5 @@
 import { Observable, of } from 'rxjs';
-import { AccessTokenModel } from '../interfaces';
+import { AccessTokenModel, UserType } from '../interfaces';
 
 export abstract class AuthenticationProvider {
     public abstract fetchUser(): Observable<unknown>;
@@ -14,7 +14,7 @@ export abstract class AuthenticationProvider {
 }
 
 export class FakeAuthenticationProvider extends AuthenticationProvider {
-    public fetchUser(): Observable<unknown> {
+    public fetchUser(): Observable<UserType> {
         return of({});
     }
 
