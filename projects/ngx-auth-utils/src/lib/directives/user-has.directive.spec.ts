@@ -3,6 +3,7 @@ import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AuthenticationService } from '../services/authentication.service';
 import { BehaviorSubject } from 'rxjs';
+import { UserType } from '../interfaces';
 
 @Component({
     template: `
@@ -17,8 +18,8 @@ describe('UserHasDirective', () => {
     let fixture: ComponentFixture<AboutComponent>;
     let authService: jasmine.SpyObj<AuthenticationService>;
 
-    function mockAuthState(user: unknown): void {
-        const authState = new BehaviorSubject<unknown>(user);
+    function mockAuthState(user: UserType): void {
+        const authState = new BehaviorSubject<UserType>(user);
         authService.getAuthenticationState.and.returnValue(authState.asObservable());
         fixture.detectChanges();
     }
