@@ -78,7 +78,7 @@ npm install -D ngx-auth-utils
     });
     ```
 
-2. Initialize the `AuthenticationService` in your root component:
+2. Initialize the `NgxAuthService` in your root component:
 
     ```typescript
     @Component({
@@ -87,8 +87,8 @@ npm install -D ngx-auth-utils
         styleUrls: ['./app.component.scss'],
     })
     export class AppComponent {
-        constructor(private authenticationService: AuthenticationService) {
-            this.authenticationService.initialize().subscribe();
+        constructor(private ngxAuthService: NgxAuthService) {
+            this.ngxAuthService.initialize().subscribe();
         }
     }
     ```
@@ -96,7 +96,7 @@ npm install -D ngx-auth-utils
     ... or in the angular `APP_INITIALIZER` in your root module:
 
     ```typescript
-    export function initializeApp(authService: AuthenticationService) {
+    export function initializeApp(authService: NgxAuthService) {
         return (): Promise<void> => {
             return new Promise<void>((resolve) => {
                 authService.initialize().subscribe();
@@ -106,12 +106,12 @@ npm install -D ngx-auth-utils
     }
 
     // Add the APP_INITIALIZIER provider
-    providers: [{ provide: APP_INITIALIZER, useFactory: initializeApp, deps: [AuthenticationService], multi: true }];
+    providers: [{ provide: APP_INITIALIZER, useFactory: initializeApp, deps: [NgxAuthService], multi: true }];
     ```
 
 3. Provide your authentication provider implementation:
 
-    The `AuthenticationProvider` provides an interface with your authentication system the `AuthenticationService`.
+    The `AuthenticationProvider` provides an interface with your authentication system the `NgxAuthService`.
 
     Any implementation of this class **must** implement the `fetchUser` and the `doLogin` methods.
 
@@ -162,11 +162,11 @@ npm install -D ngx-auth-utils
     }
     ```
 
-4. Use the `AuthenticationService` to login your users!
+4. Use the `NgxAuthService` to login your users!
 
     ```typescript
         login(): void {
-            this.authenticationService
+            this.ngxAuthService
                 .login(this.loginForm.getRawValue())
                 .subscribe((user) => {
                     console.log('The user is logged in!', user);
@@ -181,15 +181,15 @@ npm install -D ngx-auth-utils
 
 NgxAuthUtils services can be directly injected in your components, directives and services as any other Angular service.
 
-#### AuthenticationService
+#### NgxAuthService
 
-The `AuthenticationService` provides methods for logging in and out
+The `NgxAuthService` provides methods for logging in and out
 and maintains the authentication state
 
 ##### _Methods_
 
 -   `initialize(): Observable<any | null>`
-    Initializes the AuthenticationService. Should be called when initializing
+    Initializes the NgxAuthService. Should be called when initializing
     the angular application (or in your root component `onInit`).
     Performs automatic login if a token is found in the configured storage.
     Emits the user instance if user is authenticated, `null` otherwise.

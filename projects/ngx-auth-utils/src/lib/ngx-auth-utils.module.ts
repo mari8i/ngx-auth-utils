@@ -67,6 +67,8 @@ export class NgxAuthUtilsModule {
                 { provide: NO_AUTH_REDIRECT_URL, useValue: config?.noAuthRedirectUrl },
                 { provide: SESSION_EXPIRED_REDIRECT_URL, useValue: config?.sessionExpiredRedirectUrl },
                 { provide: GLOBAL_USER_CONDITION_REDIRECT_URL, useValue: config?.globalUserConditionRedirectUrl },
+                // TODO: Add auto-login option
+                // TODO: Add custom storage keys
                 AuthenticationService,
             ],
         };
