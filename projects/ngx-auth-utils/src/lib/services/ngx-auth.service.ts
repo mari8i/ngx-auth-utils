@@ -1,12 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { AuthenticationService } from './authentication.service';
-import { Observable } from 'rxjs';
-import { AuthenticationEvent, UserType } from '../interfaces';
+import { Observable, Subscription } from 'rxjs';
+import { AuthenticationEvent, AuthUserSnapshot, UserType } from '../interfaces';
 
 @Injectable({
     providedIn: 'root',
 })
-export class NgxAuthService {
+export class NgxAuthService implements OnDestroy {
+    private userSnapshot: AuthUserSnapshot = {
+        authenticated: false,
+        user: null,
+    };
+    private authStateSub: Subscription;
+
     /**
      * Emits the authentication state, which can be either:
      * - null if user is not authenticated
@@ -28,7 +34,21 @@ export class NgxAuthService {
         return this.libAuthService.getAuthenticationEvents();
     }
 
-    constructor(private libAuthService: AuthenticationService) {}
+    /**
+     * Returns the current authentication state snapshot, which can be used synchronously.
+     */
+    public get snapshot(): AuthUserSnapshot {
+        return this.userSnapshot;
+    }
+
+    constructor(private libAuthService: AuthenticationService) {
+        this.authStateSub = this.libAuthService.getAuthenticationState().subscribe((user) => {
+            this.userSnapshot = {
+                authenticated: user != null,
+                user: user,
+            };
+        });
+    }
 
     /**
      * Initializes the NgxAuthenticationService.
@@ -63,5 +83,9 @@ export class NgxAuthService {
      */
     public logout(): void {
         this.libAuthService.logout();
+    }
+
+    ngOnDestroy(): void {
+        this.authStateSub.unsubscribe();
     }
 }

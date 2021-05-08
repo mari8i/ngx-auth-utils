@@ -18,6 +18,11 @@ export interface AuthUserPredicates {
     redirectRoute?: string | false;
 }
 
+export interface AuthUserSnapshot {
+    authenticated: boolean;
+    user: UserType;
+}
+
 export class AuthenticationEvent {
     public get type(): AuthenticationEventType {
         return this._type;
