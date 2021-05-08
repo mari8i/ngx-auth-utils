@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { UserResolver } from './user.resolver';
 import { AuthenticationService } from '../services/authentication.service';
 import { BehaviorSubject } from 'rxjs';
+import { UserType } from '../interfaces';
 
 describe('UserResolver', () => {
     let resolver: UserResolver;
@@ -29,7 +30,7 @@ describe('UserResolver', () => {
 
     it('resolves authenticated user', (done: DoneFn) => {
         const user = { user: 'username' };
-        const authState = new BehaviorSubject<unknown>(user);
+        const authState = new BehaviorSubject<UserType>(user);
         authService.getAuthenticationState.and.returnValue(authState.asObservable());
 
         const result = resolver.resolve();
