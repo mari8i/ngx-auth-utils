@@ -18,14 +18,6 @@ export class AuthenticationService {
     public readonly AUTH_REFRESH_TOKEN = 'ngx-auth-refresh-token';
     public readonly AUTH_METADATA = 'ngx-auth-metadata';
 
-    public get state(): Observable<UserType> {
-        return this.authenticationState$.asObservable();
-    }
-
-    public get events(): Observable<AuthenticationEvent> {
-        return this.events$.asObservable();
-    }
-
     constructor(private storageProvider: StorageProvider, public authenticationProvider: AuthenticationProvider) {}
 
     public getAuthenticationState(): Observable<UserType> {
@@ -124,7 +116,6 @@ export class AuthenticationService {
         return null;
     }
 
-    // TODO: Improve: can we avoid to expose these methods to the public?
     sessionExpired(): void {
         const user = this.authenticationUser;
         this.doLogout();

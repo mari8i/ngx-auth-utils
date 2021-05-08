@@ -6,7 +6,7 @@ export * from './lib/ngx-auth-utils.module';
 export * from './lib/interfaces';
 export * from './lib/providers/authentication.provider';
 export * from './lib/providers/storage.provider';
-export * from './lib/services/authentication.service';
+export * from './lib/services/ngx-auth.service';
 export * from './lib/guards/auth-user.guard';
 export * from './lib/guards/anon-user.guard';
 export * from './lib/guards/auth-user-predicate.guard';
