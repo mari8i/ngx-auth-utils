@@ -87,15 +87,23 @@ describe('AuthUserPredicateGuard', () => {
         let dummyRoute: ActivatedRouteSnapshot;
         let fakeState: RouterStateSnapshot;
 
+        let eventCalled = false;
+
         beforeEach(() => {
             serviceStub.getAuthenticationState = (): Observable<any> => of(null);
             dummyRoute = createRouteSnapshotData({ condition: 'eq', value: 'bye', attribute: 'foo' });
             fakeState = fakeRouterState('/');
+            eventCalled = false;
+            serviceStub.notifyGuardBlockedAccess = (): void => {
+                eventCalled = true;
+                return;
+            };
         });
 
         it('Resolves to false', (done: DoneFn) => {
             guard.canActivate(dummyRoute, fakeState).subscribe((result) => {
                 expect(result).toBeFalse();
+                expect(eventCalled).toBeTrue();
                 done();
             });
         });
@@ -108,6 +116,7 @@ describe('AuthUserPredicateGuard', () => {
             guard.canActivate(dummyRoute, fakeState).subscribe((url) => {
                 expect(url).toBeInstanceOf(UrlTree);
                 expect(url).toEqual(dummyUrlTree);
+                expect(eventCalled).toBeTrue();
                 expect(routerSpy.parseUrl.calls.mostRecent().args).toEqual(['/test-error']);
                 done();
             });
@@ -123,6 +132,7 @@ describe('AuthUserPredicateGuard', () => {
             guard.canActivate(dummyRoute, fakeState).subscribe((url) => {
                 expect(url).toBeInstanceOf(UrlTree);
                 expect(url).toEqual(dummyUrlTree);
+                expect(eventCalled).toBeTrue();
                 expect(routerSpy.parseUrl.calls.mostRecent().args).toEqual(['/local-error']);
                 done();
             });
@@ -138,6 +148,7 @@ describe('AuthUserPredicateGuard', () => {
             guard.canActivate(dummyRoute, fakeState).subscribe((url) => {
                 expect(url).toBeInstanceOf(UrlTree);
                 expect(url).toEqual(dummyUrlTree);
+                expect(eventCalled).toBeTrue();
                 expect(routerSpy.parseUrl.calls.mostRecent().args).toEqual(['/local-error']);
                 done();
             });
@@ -152,6 +163,7 @@ describe('AuthUserPredicateGuard', () => {
 
             guard.canActivate(dummyRoute, fakeState).subscribe((resolve) => {
                 expect(resolve).toBeFalse();
+                expect(eventCalled).toBeTrue();
                 expect(routerSpy.parseUrl.calls.count()).toEqual(0);
                 done();
             });
@@ -161,16 +173,23 @@ describe('AuthUserPredicateGuard', () => {
     describe('Authenticated user', () => {
         const user = { username: 'foo', email: 'foo@bar.com', groups: ['GRP1', 'GRP2'] };
         let fakeState: RouterStateSnapshot;
+        let eventCalled = false;
 
         beforeEach(() => {
             serviceStub.getAuthenticationState = (): Observable<any> => of(user);
             fakeState = fakeRouterState('/');
+            eventCalled = false;
+            serviceStub.notifyGuardBlockedAccess = (): void => {
+                eventCalled = true;
+                return;
+            };
         });
 
         it('Eq value emits true when values are the same', (done: DoneFn) => {
             const route = createRouteSnapshotData({ condition: 'eq', attribute: 'username', value: 'foo' });
             guard.canActivate(route, fakeState).subscribe((res) => {
                 expect(res).toBeTrue();
+                expect(eventCalled).toBeFalse();
                 done();
             });
         });
@@ -179,6 +198,7 @@ describe('AuthUserPredicateGuard', () => {
             const route = createRouteSnapshotData({ condition: 'eq', attribute: 'username', value: 'bar' });
             guard.canActivate(route, fakeState).subscribe((res) => {
                 expect(res).toBeFalse();
+                expect(eventCalled).toBeTrue();
                 done();
             });
         });
@@ -187,6 +207,7 @@ describe('AuthUserPredicateGuard', () => {
             const route = createRouteSnapshotData({ condition: 'ne', attribute: 'username', value: 'foo' });
             guard.canActivate(route, fakeState).subscribe((res) => {
                 expect(res).toBeFalse();
+                expect(eventCalled).toBeTrue();
                 done();
             });
         });
@@ -195,6 +216,7 @@ describe('AuthUserPredicateGuard', () => {
             const route = createRouteSnapshotData({ condition: 'ne', attribute: 'username', value: 'bar' });
             guard.canActivate(route, fakeState).subscribe((res) => {
                 expect(res).toBeTrue();
+                expect(eventCalled).toBeFalse();
                 done();
             });
         });
@@ -203,6 +225,7 @@ describe('AuthUserPredicateGuard', () => {
             const route = createRouteSnapshotData({ condition: 'any', attribute: 'groups', value: ['GRP1', 'GRP6'] });
             guard.canActivate(route, fakeState).subscribe((res) => {
                 expect(res).toBeTrue();
+                expect(eventCalled).toBeFalse();
                 done();
             });
         });
@@ -211,6 +234,7 @@ describe('AuthUserPredicateGuard', () => {
             const route = createRouteSnapshotData({ condition: 'any', attribute: 'groups', value: ['GRP5', 'GRP6'] });
             guard.canActivate(route, fakeState).subscribe((res) => {
                 expect(res).toBeFalse();
+                expect(eventCalled).toBeTrue();
                 done();
             });
         });
@@ -219,6 +243,7 @@ describe('AuthUserPredicateGuard', () => {
             const route = createRouteSnapshotData({ condition: 'all', attribute: 'groups', value: ['GRP1', 'GRP2'] });
             guard.canActivate(route, fakeState).subscribe((res) => {
                 expect(res).toBeTrue();
+                expect(eventCalled).toBeFalse();
                 done();
             });
         });
@@ -227,6 +252,7 @@ describe('AuthUserPredicateGuard', () => {
             const route = createRouteSnapshotData({ condition: 'all', attribute: 'groups', value: ['GRP1', 'GRP3'] });
             guard.canActivate(route, fakeState).subscribe((res) => {
                 expect(res).toBeFalse();
+                expect(eventCalled).toBeTrue();
                 done();
             });
         });
@@ -235,6 +261,7 @@ describe('AuthUserPredicateGuard', () => {
             const route = createRouteSnapshotData({ condition: 'none', attribute: 'groups', value: ['GRP4', 'GRP5'] });
             guard.canActivate(route, fakeState).subscribe((res) => {
                 expect(res).toBeTrue();
+                expect(eventCalled).toBeFalse();
                 done();
             });
         });
@@ -243,6 +270,7 @@ describe('AuthUserPredicateGuard', () => {
             const route = createRouteSnapshotData({ condition: 'none', attribute: 'groups', value: ['GRP1', 'GRP3'] });
             guard.canActivate(route, fakeState).subscribe((res) => {
                 expect(res).toBeFalse();
+                expect(eventCalled).toBeTrue();
                 done();
             });
         });
