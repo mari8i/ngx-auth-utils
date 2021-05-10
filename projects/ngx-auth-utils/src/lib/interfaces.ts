@@ -5,7 +5,7 @@ export type AuthUserType = { [key: string]: unknown };
 export type UserType = AuthUserType | null;
 
 export interface AccessTokenModel {
-    accessToken: string;
+    accessToken?: string;
     refreshToken?: string;
     metadata?: { [key: string]: unknown };
     dynamicStorage?: 'local' | 'session' | 'memory';
