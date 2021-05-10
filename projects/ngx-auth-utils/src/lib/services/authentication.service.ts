@@ -65,9 +65,8 @@ export class AuthenticationService {
                 }
 
                 this.storageProvider.store(this.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
-                if (authResponse.accessToken) {
-                    this.storageProvider.store(this.AUTH_ACCESS_TOKEN, authResponse.accessToken);
-                }
+                this.storageProvider.store(this.AUTH_ACCESS_TOKEN, authResponse.accessToken);
+
                 if (authResponse.refreshToken) {
                     this.storageProvider.store(this.AUTH_REFRESH_TOKEN, authResponse.refreshToken);
                 }
@@ -85,16 +84,15 @@ export class AuthenticationService {
     }
 
     public refreshToken(): Observable<string | undefined> {
-        const accessToken = this.getAccessToken() ?? undefined;
-        const refreshToken = this.getRefreshToken() ?? undefined;
+        const accessToken = this.getAccessToken();
+        const refreshToken = this.getRefreshToken();
         const metadata = this.getMetadata();
-        // TODO: IF using cookies these checks are not needed.. do them only if not uysing cookies
-        // if (!accessToken) {
-        //     throw Error('No access token');
-        // }
-        // if (!refreshToken) {
-        //     throw Error('No refresh token');
-        // }
+        if (!accessToken) {
+            throw Error('No access token');
+        }
+        if (!refreshToken) {
+            throw Error('No refresh token');
+        }
         return this.authenticationProvider.refreshToken(accessToken, refreshToken, metadata).pipe(
             tap((newAccessToken) => {
                 this.storageProvider.store(this.AUTH_ACCESS_TOKEN, newAccessToken.accessToken);
@@ -109,7 +107,6 @@ export class AuthenticationService {
         return this.storageProvider.retrieve(this.AUTH_IS_AUTHENTICATED) != null;
     }
 
-    // TODO: Improve: can we avoid to expose these methods to the public?
     getAccessToken(): string | null {
         return this.storageProvider.retrieve(this.AUTH_ACCESS_TOKEN);
     }

@@ -8,7 +8,6 @@ import {
     REFRESH_TOKEN,
     SESSION_EXPIRED_REDIRECT_URL,
     TOKEN_TYPE,
-    USE_COOKIES,
 } from './config';
 import { AuthenticationService } from './services/authentication.service';
 import { MemoryStorageProvider, StorageProvider } from './providers/storage.provider';
@@ -28,7 +27,6 @@ export interface NgxAuthUtilsConfig {
     noAuthRedirectUrl?: string;
     sessionExpiredRedirectUrl?: string;
     globalUserConditionRedirectUrl?: string;
-    useCookies?: boolean;
     refreshToken?: boolean;
 }
 
@@ -71,7 +69,6 @@ export class NgxAuthUtilsModule {
                 { provide: NO_AUTH_REDIRECT_URL, useValue: config?.noAuthRedirectUrl },
                 { provide: SESSION_EXPIRED_REDIRECT_URL, useValue: config?.sessionExpiredRedirectUrl },
                 { provide: GLOBAL_USER_CONDITION_REDIRECT_URL, useValue: config?.globalUserConditionRedirectUrl },
-                { provide: USE_COOKIES, useValue: config?.useCookies ?? false },
                 { provide: REFRESH_TOKEN, useValue: config?.refreshToken ?? false },
                 // TODO: Add auto-login option
                 // TODO: Add custom storage keys
