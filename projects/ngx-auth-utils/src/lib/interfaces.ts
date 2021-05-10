@@ -32,6 +32,12 @@ export interface AuthUserSnapshot {
     user: UserType;
 }
 
+export type EventGuardData = {
+    guardName: string;
+    route?: ActivatedRouteSnapshot | Route;
+    state?: RouterStateSnapshot;
+};
+
 export class AuthenticationEvent {
     public get type(): AuthenticationEventType {
         return this._type;
@@ -41,13 +47,9 @@ export class AuthenticationEvent {
         return this._user;
     }
 
-    public get guardData(): { route?: ActivatedRouteSnapshot | Route; state?: RouterStateSnapshot; guardName: string } | undefined {
+    public get guardData(): EventGuardData | undefined {
         return this._guardData;
     }
 
-    constructor(
-        private _type: AuthenticationEventType,
-        private _user: UserType,
-        private _guardData?: { guardName: string; route?: ActivatedRouteSnapshot | Route; state?: RouterStateSnapshot }
-    ) {}
+    constructor(private _type: AuthenticationEventType, private _user: UserType, private _guardData?: EventGuardData) {}
 }

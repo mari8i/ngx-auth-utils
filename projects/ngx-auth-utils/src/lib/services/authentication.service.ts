@@ -5,7 +5,7 @@ import { Inject, Injectable } from '@angular/core';
 import { DynamicStorageProvider, StorageProvider } from '../providers/storage.provider';
 import { AccessTokenModel, AuthenticationEvent, UserType } from '../interfaces';
 import { ActivatedRouteSnapshot, Route, RouterStateSnapshot } from '@angular/router';
-import { AUTO_LOGIN } from '../config';
+import { AUTO_LOGIN, STORAGE_KEY_PREFIX } from '../config';
 
 @Injectable({
     providedIn: 'root',
@@ -16,16 +16,16 @@ export class AuthenticationService {
     private authenticatedUserCache?: Observable<UserType>;
     private events$ = new Subject<AuthenticationEvent>();
 
-    // TODO: Make configurable
-    public readonly AUTH_IS_AUTHENTICATED = 'ngx-auth-is-authenticated';
-    public readonly AUTH_ACCESS_TOKEN = 'ngx-auth-access-token';
-    public readonly AUTH_REFRESH_TOKEN = 'ngx-auth-refresh-token';
-    public readonly AUTH_METADATA = 'ngx-auth-metadata';
+    public readonly AUTH_IS_AUTHENTICATED = '-is-authenticated';
+    public readonly AUTH_ACCESS_TOKEN = '-access-token';
+    public readonly AUTH_REFRESH_TOKEN = '-refresh-token';
+    public readonly AUTH_METADATA = '-metadata';
 
     constructor(
         private storageProvider: StorageProvider,
         public authenticationProvider: AuthenticationProvider,
-        @Inject(AUTO_LOGIN) private autoLogin: boolean = true
+        @Inject(AUTO_LOGIN) private autoLogin: boolean = true,
+        @Inject(STORAGE_KEY_PREFIX) private storageKeyPrefix: string = 'ngx-auth'
     ) {}
 
     public getAuthenticationState(): Observable<UserType> {
@@ -70,14 +70,14 @@ export class AuthenticationService {
                     this.storageProvider.setType(authResponse.dynamicStorage);
                 }
 
-                this.storageProvider.store(this.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
-                this.storageProvider.store(this.AUTH_ACCESS_TOKEN, authResponse.accessToken);
+                this.store(this.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
+                this.store(this.AUTH_ACCESS_TOKEN, authResponse.accessToken);
 
                 if (authResponse.refreshToken) {
-                    this.storageProvider.store(this.AUTH_REFRESH_TOKEN, authResponse.refreshToken);
+                    this.store(this.AUTH_REFRESH_TOKEN, authResponse.refreshToken);
                 }
                 if (authResponse.metadata) {
-                    this.storageProvider.store(this.AUTH_METADATA, JSON.stringify(authResponse.metadata));
+                    this.store(this.AUTH_METADATA, JSON.stringify(authResponse.metadata));
                 }
             }),
             concatMap(() => this.getAuthenticatedUser(true)),
@@ -101,28 +101,28 @@ export class AuthenticationService {
         }
         return this.authenticationProvider.refreshToken(accessToken, refreshToken, metadata).pipe(
             tap((newAccessToken) => {
-                this.storageProvider.store(this.AUTH_ACCESS_TOKEN, newAccessToken.accessToken);
-                this.storageProvider.store(this.AUTH_REFRESH_TOKEN, newAccessToken.refreshToken);
-                this.storageProvider.store(this.AUTH_METADATA, JSON.stringify(newAccessToken.metadata));
+                this.store(this.AUTH_ACCESS_TOKEN, newAccessToken.accessToken);
+                this.store(this.AUTH_REFRESH_TOKEN, newAccessToken.refreshToken);
+                this.store(this.AUTH_METADATA, JSON.stringify(newAccessToken.metadata));
             }),
             map((newAccessToken) => newAccessToken.accessToken)
         );
     }
 
     hasStorageAuthenticationData(): boolean {
-        return this.storageProvider.retrieve(this.AUTH_IS_AUTHENTICATED) != null;
+        return this.retrieve(this.AUTH_IS_AUTHENTICATED) != null;
     }
 
     getAccessToken(): string | null {
-        return this.storageProvider.retrieve(this.AUTH_ACCESS_TOKEN);
+        return this.retrieve(this.AUTH_ACCESS_TOKEN);
     }
 
     getRefreshToken(): string | null {
-        return this.storageProvider.retrieve(this.AUTH_REFRESH_TOKEN);
+        return this.retrieve(this.AUTH_REFRESH_TOKEN);
     }
 
     private getMetadata(): any | null {
-        const meta = this.storageProvider.retrieve(this.AUTH_METADATA);
+        const meta = this.retrieve(this.AUTH_METADATA);
         if (meta) {
             return JSON.parse(meta);
         }
@@ -144,10 +144,11 @@ export class AuthenticationService {
 
     private doLogout(): void {
         this.authenticate(null);
-        this.storageProvider.clear(this.AUTH_ACCESS_TOKEN);
-        this.storageProvider.clear(this.AUTH_REFRESH_TOKEN);
-        this.storageProvider.clear(this.AUTH_METADATA);
-        this.storageProvider.clear(this.AUTH_IS_AUTHENTICATED);
+
+        this.clear(this.AUTH_ACCESS_TOKEN);
+        this.clear(this.AUTH_REFRESH_TOKEN);
+        this.clear(this.AUTH_METADATA);
+        this.clear(this.AUTH_IS_AUTHENTICATED);
     }
 
     private authenticate(identity: UserType): void {
@@ -172,5 +173,17 @@ export class AuthenticationService {
 
     notifyGuardBlockedAccess(guardName: string, route?: ActivatedRouteSnapshot | Route, state?: RouterStateSnapshot): void {
         this.events$.next(new AuthenticationEvent('guard-blocked-access', this.authenticationUser, { guardName, route, state }));
+    }
+
+    private store(key: string, value: unknown): void {
+        this.storageProvider.store(`${this.storageKeyPrefix}-${key}`, value);
+    }
+
+    private retrieve(key: string): string | null {
+        return this.storageProvider.retrieve(`${this.storageKeyPrefix}-${key}`);
+    }
+
+    private clear(key: string): void {
+        this.storageProvider.clear(`${this.storageKeyPrefix}-${key}`);
     }
 }

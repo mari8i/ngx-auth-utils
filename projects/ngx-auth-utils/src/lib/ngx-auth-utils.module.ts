@@ -8,6 +8,7 @@ import {
     NO_AUTH_REDIRECT_URL,
     REFRESH_TOKEN,
     SESSION_EXPIRED_REDIRECT_URL,
+    STORAGE_KEY_PREFIX,
     TOKEN_TYPE,
 } from './config';
 import { AuthenticationService } from './services/authentication.service';
@@ -30,6 +31,7 @@ export interface NgxAuthUtilsConfig {
     globalUserConditionRedirectUrl?: string;
     refreshToken?: boolean;
     autoLogin?: boolean;
+    storageKeyPrefix?: string;
 }
 
 @NgModule({
@@ -73,7 +75,7 @@ export class NgxAuthUtilsModule {
                 { provide: GLOBAL_USER_CONDITION_REDIRECT_URL, useValue: config?.globalUserConditionRedirectUrl },
                 { provide: REFRESH_TOKEN, useValue: config?.refreshToken ?? false },
                 { provide: AUTO_LOGIN, useValue: config?.autoLogin ?? true },
-                // TODO: Add custom storage keys
+                { provide: STORAGE_KEY_PREFIX, useValue: config?.storageKeyPrefix ?? 'ngx-auth' },
                 AuthenticationService,
             ],
         };

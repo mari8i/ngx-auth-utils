@@ -8,3 +8,4 @@ export const GLOBAL_USER_CONDITION_REDIRECT_URL = new InjectionToken<string>('GL
 export const SESSION_EXPIRED_REDIRECT_URL = new InjectionToken<string>('SESSION_EXPIRED_REDIRECT_URL');
 export const REFRESH_TOKEN = new InjectionToken<string>('REFRESH_TOKEN');
 export const AUTO_LOGIN = new InjectionToken<string>('AUTO_LOGIN');
+export const STORAGE_KEY_PREFIX = new InjectionToken<string>('STORAGE_KEY_PREFIX');

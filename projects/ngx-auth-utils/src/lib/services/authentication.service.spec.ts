@@ -5,9 +5,10 @@ import { AuthenticationProvider } from '../providers/authentication.provider';
 import { MemoryStorageProvider, StorageProvider } from '../providers/storage.provider';
 
 import { AuthenticationService } from './authentication.service';
-import { AUTO_LOGIN } from '../config';
+import { AUTO_LOGIN, STORAGE_KEY_PREFIX } from '../config';
 
 describe('AuthenticationService', () => {
+    const storagePrefix = 'ngx-auth-test';
     let service: AuthenticationService;
     let authProviderSpy: jasmine.SpyObj<AuthenticationProvider>;
     let storageProvider: StorageProvider;
@@ -21,6 +22,7 @@ describe('AuthenticationService', () => {
                 { provide: StorageProvider, useValue: new MemoryStorageProvider() },
                 { provide: AuthenticationProvider, useValue: authSpy },
                 { provide: AUTO_LOGIN, useValue: true },
+                { provide: STORAGE_KEY_PREFIX, useValue: storagePrefix },
             ],
         });
         service = TestBed.inject(AuthenticationService);
@@ -51,8 +53,8 @@ describe('AuthenticationService', () => {
             expect(authProviderSpy.doLogin.calls.count()).toEqual(1);
             expect(authProviderSpy.doLogin.calls.mostRecent().args).toEqual([credentials]);
 
-            expect(storageProvider.retrieve(service.AUTH_ACCESS_TOKEN)).toEqual(tokenPair.accessToken);
-            expect(storageProvider.retrieve(service.AUTH_REFRESH_TOKEN)).toEqual(tokenPair.refreshToken);
+            expect(storageProvider.retrieve(storagePrefix + '-' + service.AUTH_ACCESS_TOKEN)).toEqual(tokenPair.accessToken);
+            expect(storageProvider.retrieve(storagePrefix + '-' + service.AUTH_REFRESH_TOKEN)).toEqual(tokenPair.refreshToken);
 
             expect(authProviderSpy.fetchUser.calls.count()).toEqual(1);
 
@@ -97,8 +99,8 @@ describe('AuthenticationService', () => {
                     expect(err).toEqual(userError);
                     expect(service.isAuthenticated()).toBeFalsy();
 
-                    expect(storageProvider.retrieve(service.AUTH_ACCESS_TOKEN)).toBeUndefined();
-                    expect(storageProvider.retrieve(service.AUTH_REFRESH_TOKEN)).toBeUndefined();
+                    expect(storageProvider.retrieve(storagePrefix + '-' + service.AUTH_ACCESS_TOKEN)).toBeUndefined();
+                    expect(storageProvider.retrieve(storagePrefix + '-' + service.AUTH_REFRESH_TOKEN)).toBeUndefined();
                     done();
                     return EMPTY;
                 })
@@ -136,8 +138,8 @@ describe('AuthenticationService', () => {
         const user = { name: 'Foo', surname: 'Bar', email: 'foo@bar.com' };
         authProviderSpy.fetchUser.and.returnValue(of(user));
 
-        storageProvider.store(service.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
-        storageProvider.store(service.AUTH_ACCESS_TOKEN, 'valid-access-token');
+        storageProvider.store(storagePrefix + '-' + service.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
+        storageProvider.store(storagePrefix + '-' + service.AUTH_ACCESS_TOKEN, 'valid-access-token');
 
         service.initialize().subscribe((authUser) => {
             expect(authUser).toEqual(user);
@@ -151,8 +153,8 @@ describe('AuthenticationService', () => {
         const userError = { error: 'foo' };
         authProviderSpy.fetchUser.and.returnValue(throwError(userError));
 
-        storageProvider.store(service.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
-        storageProvider.store(service.AUTH_ACCESS_TOKEN, 'expired-access-token');
+        storageProvider.store(storagePrefix + '-' + service.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
+        storageProvider.store(storagePrefix + '-' + service.AUTH_ACCESS_TOKEN, 'expired-access-token');
 
         service.initialize().subscribe((authUser) => {
             expect(authUser).toBeFalsy();
