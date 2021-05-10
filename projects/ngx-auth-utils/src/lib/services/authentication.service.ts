@@ -158,6 +158,9 @@ export class AuthenticationService {
     private doInitialize(): Observable<UserType> {
         if (this.autoLogin && this.hasStorageAuthenticationData()) {
             return this.getAuthenticatedUser(true).pipe(
+                tap((user) => {
+                    this.events$.next(new AuthenticationEvent('auto-login', user));
+                }),
                 take(1),
                 catchError(() => of(null))
             );

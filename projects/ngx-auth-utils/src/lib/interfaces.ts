@@ -1,6 +1,13 @@
 import { ActivatedRouteSnapshot, Route, RouterStateSnapshot } from '@angular/router';
 
-export type AuthenticationEventType = 'login' | 'login-failed' | 'logout' | 'session-expired' | 'initialized' | 'guard-blocked-access';
+export type AuthenticationEventType =
+    | 'login'
+    | 'auto-login'
+    | 'login-failed'
+    | 'logout'
+    | 'session-expired'
+    | 'initialized'
+    | 'guard-blocked-access';
 
 export type AuthUserType = { [key: string]: unknown };
 
