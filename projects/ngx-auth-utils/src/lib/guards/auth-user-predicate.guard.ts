@@ -34,16 +34,16 @@ export class AuthUserPredicateGuard implements CanActivate, CanActivateChild, Ca
 
     /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
     canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
-        return this.checkConditionsAndRedirect(childRoute);
+        return this.checkConditionsAndRedirect(childRoute, state);
     }
 
     /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
-        return this.checkConditionsAndRedirect(route);
+        return this.checkConditionsAndRedirect(route, state);
     }
 
-    private checkConditionsAndRedirect(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> {
-        return this.checkConditions(route).pipe(
+    private checkConditionsAndRedirect(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
+        return this.checkConditions(route, state).pipe(
             map((result) => {
                 if (!result) {
                     const localRedirectRoute = route?.data?.authUserPredicate?.redirectRoute;
@@ -63,11 +63,15 @@ export class AuthUserPredicateGuard implements CanActivate, CanActivateChild, Ca
         );
     }
 
-    private checkConditions(route: ActivatedRouteSnapshot | Route): Observable<boolean> {
+    private checkConditions(route: ActivatedRouteSnapshot | Route, state?: RouterStateSnapshot): Observable<boolean> {
         return this.authenticationService.getAuthenticationState().pipe(
             take(1),
             map((user) => {
-                return user != null && this.checkPredicatesAgainstUser(user, route.data?.authUserPredicate);
+                const conditionsValid = user != null && this.checkPredicatesAgainstUser(user, route.data?.authUserPredicate);
+                if (!conditionsValid) {
+                    this.authenticationService.notifyGuardBlockedAccess('AuthUserPredicateGuard', route, state);
+                }
+                return conditionsValid;
             })
         );
     }

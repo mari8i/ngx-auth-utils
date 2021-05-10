@@ -4,6 +4,7 @@ import { AuthenticationProvider } from '../providers/authentication.provider';
 import { Injectable } from '@angular/core';
 import { DynamicStorageProvider, StorageProvider } from '../providers/storage.provider';
 import { AccessTokenModel, AuthenticationEvent, UserType } from '../interfaces';
+import { ActivatedRouteSnapshot, Route, RouterStateSnapshot } from '@angular/router';
 
 @Injectable({
     providedIn: 'root',
@@ -159,5 +160,9 @@ export class AuthenticationService {
 
         this.authenticate(null);
         return of(null);
+    }
+
+    notifyGuardBlockedAccess(guardName: string, route?: ActivatedRouteSnapshot | Route, state?: RouterStateSnapshot): void {
+        this.events$.next(new AuthenticationEvent('guard-blocked-access', this.authenticationUser, { guardName, route, state }));
     }
 }

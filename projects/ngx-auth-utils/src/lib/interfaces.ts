@@ -1,4 +1,6 @@
-export type AuthenticationEventType = 'login' | 'login-failed' | 'logout' | 'session-expired' | 'initialized';
+import { ActivatedRouteSnapshot, Route, RouterStateSnapshot } from '@angular/router';
+
+export type AuthenticationEventType = 'login' | 'login-failed' | 'logout' | 'session-expired' | 'initialized' | 'guard-blocked-access';
 
 export type AuthUserType = { [key: string]: unknown };
 
@@ -32,5 +34,13 @@ export class AuthenticationEvent {
         return this._user;
     }
 
-    constructor(private _type: AuthenticationEventType, private _user: UserType) {}
+    public get guardData(): { route?: ActivatedRouteSnapshot | Route; state?: RouterStateSnapshot; guardName: string } | undefined {
+        return this._guardData;
+    }
+
+    constructor(
+        private _type: AuthenticationEventType,
+        private _user: UserType,
+        private _guardData?: { guardName: string; route?: ActivatedRouteSnapshot | Route; state?: RouterStateSnapshot }
+    ) {}
 }

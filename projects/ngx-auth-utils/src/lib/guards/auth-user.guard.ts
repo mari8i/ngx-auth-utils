@@ -1,5 +1,14 @@
 import { Inject, Injectable } from '@angular/core';
-import { CanActivate, CanActivateChild, CanLoad, Router, UrlTree } from '@angular/router';
+import {
+    ActivatedRouteSnapshot,
+    CanActivate,
+    CanActivateChild,
+    CanLoad,
+    Route,
+    Router,
+    RouterStateSnapshot,
+    UrlTree,
+} from '@angular/router';
 import { map, take } from 'rxjs/operators';
 import { AuthenticationService } from '../services/authentication.service';
 import { NO_AUTH_REDIRECT_URL } from '../config';
@@ -15,20 +24,20 @@ export class AuthUserGuard implements CanActivate, CanActivateChild, CanLoad {
         @Inject(NO_AUTH_REDIRECT_URL) private noAuthRedirectUrl: string | undefined
     ) {}
 
-    canActivate(): Observable<boolean | UrlTree> {
-        return this.checkAuthAndRedirect();
+    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
+        return this.checkAuthAndRedirect(route, state);
     }
 
-    canActivateChild(): Observable<boolean | UrlTree> {
-        return this.checkAuthAndRedirect();
+    canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
+        return this.checkAuthAndRedirect(route, state);
     }
 
     canLoad(): Observable<boolean> {
         return this.checkAuthentication();
     }
 
-    private checkAuthAndRedirect(): Observable<boolean | UrlTree> {
-        return this.checkAuthentication().pipe(
+    private checkAuthAndRedirect(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
+        return this.checkAuthentication(route, state).pipe(
             map((isAuth) => {
                 if (!isAuth && this.noAuthRedirectUrl != null) {
                     return this.router.parseUrl(this.noAuthRedirectUrl);
@@ -38,10 +47,16 @@ export class AuthUserGuard implements CanActivate, CanActivateChild, CanLoad {
         );
     }
 
-    private checkAuthentication(): Observable<boolean> {
+    private checkAuthentication(route?: ActivatedRouteSnapshot | Route, state?: RouterStateSnapshot): Observable<boolean> {
         return this.authenticationService.getAuthenticationState().pipe(
             take(1),
-            map((user) => user != null)
+            map((user) => {
+                if (user == null) {
+                    this.authenticationService.notifyGuardBlockedAccess('AuthUserGuard', route, state);
+                    return false;
+                }
+                return true;
+            })
         );
     }
 }
