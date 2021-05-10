@@ -84,16 +84,17 @@ export class AuthenticationService {
         );
     }
 
-    public refreshToken(): Observable<string> {
-        const accessToken = this.getAccessToken();
-        const refreshToken = this.getRefreshToken();
+    public refreshToken(): Observable<string | undefined> {
+        const accessToken = this.getAccessToken() ?? undefined;
+        const refreshToken = this.getRefreshToken() ?? undefined;
         const metadata = this.getMetadata();
-        if (!accessToken) {
-            throw Error('No access token');
-        }
-        if (!refreshToken) {
-            throw Error('No refresh token');
-        }
+        // TODO: IF using cookies these checks are not needed.. do them only if not uysing cookies
+        // if (!accessToken) {
+        //     throw Error('No access token');
+        // }
+        // if (!refreshToken) {
+        //     throw Error('No refresh token');
+        // }
         return this.authenticationProvider.refreshToken(accessToken, refreshToken, metadata).pipe(
             tap((newAccessToken) => {
                 this.storageProvider.store(this.AUTH_ACCESS_TOKEN, newAccessToken.accessToken);

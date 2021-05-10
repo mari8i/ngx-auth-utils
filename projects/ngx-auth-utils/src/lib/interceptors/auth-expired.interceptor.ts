@@ -5,8 +5,7 @@ import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { AuthenticationService } from '../services/authentication.service';
 import { StorageProvider } from '../providers/storage.provider';
-import { AUTHENTICATION_HEADER, SESSION_EXPIRED_REDIRECT_URL, TOKEN_TYPE } from '../config';
-import { AuthInterceptor } from './auth.interceptor';
+import { AUTHENTICATION_HEADER, REFRESH_TOKEN, SESSION_EXPIRED_REDIRECT_URL, TOKEN_TYPE } from '../config';
 
 @Injectable()
 export class AuthExpiredInterceptor implements HttpInterceptor {
@@ -19,26 +18,20 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
         @Inject(SESSION_EXPIRED_REDIRECT_URL) private sessionExpiredRedirectUrl: string | undefined,
         @Inject(AUTHENTICATION_HEADER)
         private authenticationHeader: string = 'Authorization',
-        @Inject(TOKEN_TYPE) private tokenType: string = 'Bearer'
+        @Inject(TOKEN_TYPE) private tokenType: string = 'Bearer',
+        @Inject(REFRESH_TOKEN) private refreshToken: boolean = false
     ) {}
 
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         return next.handle(request).pipe(
             catchError((err: HttpErrorResponse) => {
                 if (err.status === 401) {
-                    const refreshToken = this.authenticationService.getRefreshToken();
-                    if (refreshToken != null && !this.handlingRefresh) {
+                    if (this.refreshToken && !this.handlingRefresh) {
                         this.handlingRefresh = true;
                         return this.authenticationService.refreshToken().pipe(
-                            switchMap((newToken) => {
+                            switchMap(() => {
                                 this.handlingRefresh = false;
-                                const clonedReq = AuthInterceptor.addHeaderToRequest(
-                                    request,
-                                    this.authenticationHeader,
-                                    this.tokenType,
-                                    newToken
-                                );
-                                return next.handle(clonedReq);
+                                return next.handle(request.clone());
                             }),
                             catchError(() => {
                                 this.handlingRefresh = false;
