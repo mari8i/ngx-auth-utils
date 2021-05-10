@@ -23,7 +23,7 @@ export class AuthenticationService {
 
     constructor(
         private storageProvider: StorageProvider,
-        public authenticationProvider: AuthenticationProvider,
+        private authenticationProvider: AuthenticationProvider,
         @Inject(AUTO_LOGIN) private autoLogin: boolean = true,
         @Inject(STORAGE_KEY_PREFIX) private storageKeyPrefix: string = 'ngx-auth'
     ) {}
