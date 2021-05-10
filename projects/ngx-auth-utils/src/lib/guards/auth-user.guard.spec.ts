@@ -9,11 +9,15 @@ describe('AuthUserPredicateGuard', () => {
     const serviceStub: Partial<AuthenticationService> = {};
 
     describe('Unauthenticated, without redirect', () => {
+        let eventCalled = false;
+
         beforeEach(() => {
             routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate', 'parseUrl']);
             guard = new AuthUserGuard(serviceStub as AuthenticationService, routerSpy, undefined);
             serviceStub.getAuthenticationState = (): Observable<any> => of(null);
+            eventCalled = false;
             serviceStub.notifyGuardBlockedAccess = (): void => {
+                eventCalled = true;
                 return;
             };
         });
@@ -21,17 +25,22 @@ describe('AuthUserPredicateGuard', () => {
         it('emits false when user is not authenticated', (done: DoneFn) => {
             guard.canActivate({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot).subscribe((res: UrlTree | boolean) => {
                 expect(res).toBeFalse();
+                expect(eventCalled).toBeTrue();
                 done();
             });
         });
     });
 
     describe('Unauthenticated, with redirect', () => {
+        let eventCalled = false;
+
         beforeEach(() => {
             routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate', 'parseUrl']);
             guard = new AuthUserGuard(serviceStub as AuthenticationService, routerSpy, '/error');
             serviceStub.getAuthenticationState = (): Observable<any> => of(null);
+            eventCalled = false;
             serviceStub.notifyGuardBlockedAccess = (): void => {
+                eventCalled = true;
                 return;
             };
         });
@@ -44,6 +53,7 @@ describe('AuthUserPredicateGuard', () => {
                 expect(url).toBeInstanceOf(UrlTree);
                 expect(url).toEqual(dummyUrlTree);
                 expect(routerSpy.parseUrl.calls.mostRecent().args).toEqual(['/error']);
+                expect(eventCalled).toBeTrue();
                 done();
             });
         });
@@ -54,10 +64,6 @@ describe('AuthUserPredicateGuard', () => {
             routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate', 'parseUrl']);
             guard = new AuthUserGuard(serviceStub as AuthenticationService, routerSpy, undefined);
             serviceStub.getAuthenticationState = (): Observable<any> => of({ username: 'foo' });
-            // TODO: Test this is called! Also elsewhere
-            serviceStub.notifyGuardBlockedAccess = (): void => {
-                return;
-            };
         });
 
         it('emits true when user is authenticated', (done: DoneFn) => {
