@@ -89,7 +89,7 @@ export class AuthenticationService {
         );
     }
 
-    public refreshToken(): Observable<string | undefined> {
+    public refreshToken(): Observable<string> {
         const accessToken = this.getAccessToken();
         const refreshToken = this.getRefreshToken();
         const metadata = this.getMetadata();
