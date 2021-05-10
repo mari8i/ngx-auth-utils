@@ -1,10 +1,11 @@
 import { Observable, of, ReplaySubject, Subject, throwError } from 'rxjs';
 import { catchError, concatMap, map, shareReplay, take, tap } from 'rxjs/operators';
 import { AuthenticationProvider } from '../providers/authentication.provider';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { DynamicStorageProvider, StorageProvider } from '../providers/storage.provider';
 import { AccessTokenModel, AuthenticationEvent, UserType } from '../interfaces';
 import { ActivatedRouteSnapshot, Route, RouterStateSnapshot } from '@angular/router';
+import { AUTO_LOGIN } from '../config';
 
 @Injectable({
     providedIn: 'root',
@@ -21,7 +22,11 @@ export class AuthenticationService {
     public readonly AUTH_REFRESH_TOKEN = 'ngx-auth-refresh-token';
     public readonly AUTH_METADATA = 'ngx-auth-metadata';
 
-    constructor(private storageProvider: StorageProvider, public authenticationProvider: AuthenticationProvider) {}
+    constructor(
+        private storageProvider: StorageProvider,
+        public authenticationProvider: AuthenticationProvider,
+        @Inject(AUTO_LOGIN) private autoLogin: boolean = true
+    ) {}
 
     public getAuthenticationState(): Observable<UserType> {
         return this.authenticationState$.asObservable();
@@ -151,7 +156,7 @@ export class AuthenticationService {
     }
 
     private doInitialize(): Observable<UserType> {
-        if (this.hasStorageAuthenticationData()) {
+        if (this.autoLogin && this.hasStorageAuthenticationData()) {
             return this.getAuthenticatedUser(true).pipe(
                 take(1),
                 catchError(() => of(null))

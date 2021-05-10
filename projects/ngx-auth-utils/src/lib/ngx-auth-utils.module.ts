@@ -2,6 +2,7 @@ import { ModuleWithProviders, NgModule, Provider } from '@angular/core';
 import { AuthenticationProvider, FakeAuthenticationProvider } from './providers/authentication.provider';
 import {
     AUTHENTICATION_HEADER,
+    AUTO_LOGIN,
     GLOBAL_USER_CONDITION_REDIRECT_URL,
     HOME_URL,
     NO_AUTH_REDIRECT_URL,
@@ -28,6 +29,7 @@ export interface NgxAuthUtilsConfig {
     sessionExpiredRedirectUrl?: string;
     globalUserConditionRedirectUrl?: string;
     refreshToken?: boolean;
+    autoLogin?: boolean;
 }
 
 @NgModule({
@@ -70,7 +72,7 @@ export class NgxAuthUtilsModule {
                 { provide: SESSION_EXPIRED_REDIRECT_URL, useValue: config?.sessionExpiredRedirectUrl },
                 { provide: GLOBAL_USER_CONDITION_REDIRECT_URL, useValue: config?.globalUserConditionRedirectUrl },
                 { provide: REFRESH_TOKEN, useValue: config?.refreshToken ?? false },
-                // TODO: Add auto-login option
+                { provide: AUTO_LOGIN, useValue: config?.autoLogin ?? true },
                 // TODO: Add custom storage keys
                 AuthenticationService,
             ],
