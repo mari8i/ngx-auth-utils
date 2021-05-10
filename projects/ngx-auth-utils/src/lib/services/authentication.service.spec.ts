@@ -5,6 +5,7 @@ import { AuthenticationProvider } from '../providers/authentication.provider';
 import { MemoryStorageProvider, StorageProvider } from '../providers/storage.provider';
 
 import { AuthenticationService } from './authentication.service';
+import { AUTO_LOGIN } from '../config';
 
 describe('AuthenticationService', () => {
     let service: AuthenticationService;
@@ -19,6 +20,7 @@ describe('AuthenticationService', () => {
                 AuthenticationService,
                 { provide: StorageProvider, useValue: new MemoryStorageProvider() },
                 { provide: AuthenticationProvider, useValue: authSpy },
+                { provide: AUTO_LOGIN, useValue: true },
             ],
         });
         service = TestBed.inject(AuthenticationService);

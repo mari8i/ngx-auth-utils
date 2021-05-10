@@ -6,6 +6,7 @@ import { DynamicStorageProvider, StorageProvider } from '../providers/storage.pr
 
 import { AuthenticationService } from './authentication.service';
 import { AccessTokenModel } from '../interfaces';
+import { AUTO_LOGIN } from '../config';
 
 describe('AuthenticationServiceWithDynamicStorage', () => {
     let service: AuthenticationService;
@@ -26,6 +27,7 @@ describe('AuthenticationServiceWithDynamicStorage', () => {
                 AuthenticationService,
                 { provide: StorageProvider, useValue: new DynamicStorageProvider() },
                 { provide: AuthenticationProvider, useValue: authSpy },
+                { provide: AUTO_LOGIN, useValue: true },
             ],
         });
         service = TestBed.inject(AuthenticationService);
