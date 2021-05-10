@@ -14,6 +14,8 @@ export class AuthenticationService {
     private authenticatedUserCache?: Observable<UserType>;
     private events$ = new Subject<AuthenticationEvent>();
 
+    // TODO: Make configurable
+    public readonly AUTH_IS_AUTHENTICATED = 'ngx-auth-is-authenticated';
     public readonly AUTH_ACCESS_TOKEN = 'ngx-auth-access-token';
     public readonly AUTH_REFRESH_TOKEN = 'ngx-auth-refresh-token';
     public readonly AUTH_METADATA = 'ngx-auth-metadata';
@@ -62,7 +64,10 @@ export class AuthenticationService {
                     this.storageProvider.setType(authResponse.dynamicStorage);
                 }
 
-                this.storageProvider.store(this.AUTH_ACCESS_TOKEN, authResponse.accessToken);
+                this.storageProvider.store(this.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
+                if (authResponse.accessToken) {
+                    this.storageProvider.store(this.AUTH_ACCESS_TOKEN, authResponse.accessToken);
+                }
                 if (authResponse.refreshToken) {
                     this.storageProvider.store(this.AUTH_REFRESH_TOKEN, authResponse.refreshToken);
                 }
@@ -97,6 +102,10 @@ export class AuthenticationService {
             }),
             map((newAccessToken) => newAccessToken.accessToken)
         );
+    }
+
+    hasStorageAuthenticationData(): boolean {
+        return this.storageProvider.retrieve(this.AUTH_IS_AUTHENTICATED) != null;
     }
 
     // TODO: Improve: can we avoid to expose these methods to the public?
@@ -134,6 +143,7 @@ export class AuthenticationService {
         this.storageProvider.clear(this.AUTH_ACCESS_TOKEN);
         this.storageProvider.clear(this.AUTH_REFRESH_TOKEN);
         this.storageProvider.clear(this.AUTH_METADATA);
+        this.storageProvider.clear(this.AUTH_IS_AUTHENTICATED);
     }
 
     private authenticate(identity: UserType): void {
@@ -142,7 +152,7 @@ export class AuthenticationService {
     }
 
     private doInitialize(): Observable<UserType> {
-        if (this.getAccessToken() != null) {
+        if (this.hasStorageAuthenticationData()) {
             return this.getAuthenticatedUser(true).pipe(
                 take(1),
                 catchError(() => of(null))

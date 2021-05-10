@@ -134,6 +134,7 @@ describe('AuthenticationService', () => {
         const user = { name: 'Foo', surname: 'Bar', email: 'foo@bar.com' };
         authProviderSpy.fetchUser.and.returnValue(of(user));
 
+        storageProvider.store(service.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
         storageProvider.store(service.AUTH_ACCESS_TOKEN, 'valid-access-token');
 
         service.initialize().subscribe((authUser) => {
@@ -148,6 +149,7 @@ describe('AuthenticationService', () => {
         const userError = { error: 'foo' };
         authProviderSpy.fetchUser.and.returnValue(throwError(userError));
 
+        storageProvider.store(service.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
         storageProvider.store(service.AUTH_ACCESS_TOKEN, 'expired-access-token');
 
         service.initialize().subscribe((authUser) => {
