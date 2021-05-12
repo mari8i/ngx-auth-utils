@@ -9,7 +9,7 @@ export type AuthenticationEventType =
     | 'initialized'
     | 'guard-blocked-access';
 
-export type AuthUserType = { [key: string]: unknown };
+export type AuthUserType = any;
 
 export type UserType = AuthUserType | null;
 
