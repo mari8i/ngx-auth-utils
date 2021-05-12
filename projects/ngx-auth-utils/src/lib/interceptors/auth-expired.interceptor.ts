@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { EMPTY, Observable, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { AuthenticationService } from '../services/authentication.service';
 import { StorageProvider } from '../providers/storage.provider';
@@ -25,7 +25,7 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         return next.handle(request).pipe(
             catchError((err: HttpErrorResponse) => {
-                if (err.status === 401) {
+                if (err.status === 401 && this.authenticationService.isAuthenticated()) {
                     if (this.refreshToken && !this.handlingRefresh) {
                         this.handlingRefresh = true;
                         return this.authenticationService.refreshToken().pipe(
@@ -36,13 +36,12 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
                             catchError(() => {
                                 this.handlingRefresh = false;
                                 this.handle401Failure();
-                                return EMPTY;
+                                return throwError(err);
                             })
                         );
                     }
 
                     this.handle401Failure();
-                    return EMPTY;
                 }
                 return throwError(err);
             })
