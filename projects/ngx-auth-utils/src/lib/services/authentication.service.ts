@@ -121,6 +121,10 @@ export class AuthenticationService {
         return this.retrieve(this.AUTH_REFRESH_TOKEN);
     }
 
+    hasRefreshToken(): boolean {
+        return this.getRefreshToken() != null;
+    }
+
     private getMetadata(): any | null {
         const meta = this.retrieve(this.AUTH_METADATA);
         if (meta) {

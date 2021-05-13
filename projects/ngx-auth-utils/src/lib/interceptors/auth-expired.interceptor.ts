@@ -25,7 +25,7 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         return next.handle(request).pipe(
             catchError((err: HttpErrorResponse) => {
-                if (err.status === 401 && this.authenticationService.isAuthenticated()) {
+                if (err.status === 401 && this.authenticationService.hasRefreshToken()) {
                     if (this.refreshToken && !this.handlingRefresh) {
                         this.handlingRefresh = true;
                         return this.authenticationService.refreshToken().pipe(
