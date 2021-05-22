@@ -9,3 +9,4 @@ export const SESSION_EXPIRED_REDIRECT_URL = new InjectionToken<string>('SESSION_
 export const REFRESH_TOKEN = new InjectionToken<string>('REFRESH_TOKEN');
 export const AUTO_LOGIN = new InjectionToken<string>('AUTO_LOGIN');
 export const STORAGE_KEY_PREFIX = new InjectionToken<string>('STORAGE_KEY_PREFIX');
+export const UNAUTHORIZED_URL_BLACKLIST = new InjectionToken<string>('UNAUTHORIZED_URL_BLACKLIST');

@@ -10,6 +10,7 @@ import {
     SESSION_EXPIRED_REDIRECT_URL,
     STORAGE_KEY_PREFIX,
     TOKEN_TYPE,
+    UNAUTHORIZED_URL_BLACKLIST,
 } from './config';
 import { AuthenticationService } from './services/authentication.service';
 import { MemoryStorageProvider, StorageProvider } from './providers/storage.provider';
@@ -32,6 +33,7 @@ export interface NgxAuthUtilsConfig {
     refreshToken?: boolean;
     autoLogin?: boolean;
     storageKeyPrefix?: string;
+    unauthorizedUrlBlacklist?: string[];
 }
 
 @NgModule({
@@ -76,6 +78,7 @@ export class NgxAuthUtilsModule {
                 { provide: REFRESH_TOKEN, useValue: config?.refreshToken ?? false },
                 { provide: AUTO_LOGIN, useValue: config?.autoLogin ?? true },
                 { provide: STORAGE_KEY_PREFIX, useValue: config?.storageKeyPrefix ?? 'ngx-auth' },
+                { provide: UNAUTHORIZED_URL_BLACKLIST, useValue: config.unauthorizedUrlBlacklist ?? [] },
                 AuthenticationService,
             ],
         };
