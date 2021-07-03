@@ -14,3 +14,4 @@ export * from './lib/resolvers/user.resolver';
 export * from './lib/directives/user-has.directive';
 export * from './lib/directives/is-auth.directive';
 export * from './lib/directives/user.directive';
+export * from './lib/directives/conditional.directive';

@@ -10,6 +10,8 @@ import { UserType } from '../interfaces';
         <div id="any" *ngxAuthHas="'roles'; any: ['FOO', 'BAR']">FooBar!</div>
         <div id="all" *ngxAuthHas="'roles'; all: ['FOO', 'BAR']">FooBar!</div>
         <div id="eq" *ngxAuthHas="'name'; eq: 'foo'">FooBar!</div>
+        <div id="eqCondTrue" *ngxAuthHas="'name'; eq: 'foo'; cond: 1 == '1'">FooBar!</div>
+        <div id="eqCondFalse" *ngxAuthHas="'name'; eq: 'foo'; cond: 1 === '1'">FooBar!</div>
     `,
 })
 export class AboutComponent {}
@@ -91,6 +93,23 @@ describe('UserHasDirective', () => {
         mockAuthState(user);
 
         const div: HTMLElement = fixture.nativeElement.querySelector('#eq');
+        expect(div).toBeNull();
+    });
+
+    it('shows contents if condition is true', () => {
+        const user = { user: 'username', name: 'foo' };
+        mockAuthState(user);
+
+        const div: HTMLElement = fixture.nativeElement.querySelector('#eqCondTrue');
+        const contents = div.textContent;
+        expect(contents).toBe('FooBar!');
+    });
+
+    it('hides contents if condition is false', () => {
+        const user = { user: 'username', name: 'foo' };
+        mockAuthState(user);
+
+        const div: HTMLElement = fixture.nativeElement.querySelector('#eqCondFalse');
         expect(div).toBeNull();
     });
 });

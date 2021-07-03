@@ -26,12 +26,15 @@ export class UserHasDirective extends ConditionalDirective {
     @Input()
     ngxAuthHasNone?: string[];
 
+    @Input()
+    ngxAuthHasCond = true;
+
     constructor(authenticationService: AuthenticationService, templateRef: TemplateRef<unknown>, viewContainer: ViewContainerRef) {
         super(authenticationService, templateRef, viewContainer);
     }
 
     shouldShow(user: UserType): boolean {
-        return user != null && this.checkConditions(user);
+        return user != null && this.checkConditions(user) && this.ngxAuthHasCond;
     }
 
     private checkConditions(user: AuthUserType): boolean {
