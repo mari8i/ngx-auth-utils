@@ -1,5 +1,6 @@
 VERSION="$1"
 git checkout main
+cp README.md projects/ngx-auth-utils/README.md
 perl -pi -e "s/version\": \".*?\"/version\": \"$VERSION\"/" projects/ngx-auth-utils/package.json
 git commit -am "Bump version $VERSION"
 git tag $VERSION

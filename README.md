@@ -396,6 +396,14 @@ can be used directly in the template.
 <div *ngxAuthHas="'groups'; none: ['FOO', 'BAR']">User is neither in group FOO and group BAR</div>
 ```
 
+**Additional condition**
+
+You might find this one very useful: add an additional condition to the `ngxAuthHas` directive
+
+```angular2html
+<div *ngxAuthHas="'groups'; any: ['FOO', 'BAR']; cond: a === 'hello'">Show if both user is in groups and condition evaluates to true</div>
+```
+
 ### ngxAuthUser
 
 The `ngxAuthUser` directive provides the authenticated user instance directly in your templates:
