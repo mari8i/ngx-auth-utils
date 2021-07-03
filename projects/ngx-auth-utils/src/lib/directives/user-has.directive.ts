@@ -1,13 +1,13 @@
-import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Directive, Input, OnChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
-import { ConditionalDirective } from './conditional.directive';
+import { AuthConditionalDirective } from './auth-conditional.directive';
 import { UserConditions } from '../utils/user-conditions';
 import { AuthUserType, UserType } from '../interfaces';
 
 @Directive({
     selector: '[ngxAuthHas]',
 })
-export class UserHasDirective extends ConditionalDirective {
+export class UserHasDirective extends AuthConditionalDirective implements OnChanges {
     @Input()
     ngxAuthHas = '';
 
@@ -29,12 +29,19 @@ export class UserHasDirective extends ConditionalDirective {
     @Input()
     ngxAuthHasCond = true;
 
+    @Input()
+    ngxAuthHasElse?: TemplateRef<unknown>;
+
     constructor(authenticationService: AuthenticationService, templateRef: TemplateRef<unknown>, viewContainer: ViewContainerRef) {
         super(authenticationService, templateRef, viewContainer);
     }
 
     shouldShow(user: UserType): boolean {
         return user != null && this.checkConditions(user) && this.ngxAuthHasCond;
+    }
+
+    protected getElseTemplateRef(): TemplateRef<unknown> | undefined {
+        return this.ngxAuthHasElse;
     }
 
     private checkConditions(user: AuthUserType): boolean {
@@ -65,5 +72,9 @@ export class UserHasDirective extends ConditionalDirective {
         }
 
         throw Error('Use one of the operators: anyIn, allIn, eq');
+    }
+
+    ngOnChanges(): void {
+        this.updateView();
     }
 }

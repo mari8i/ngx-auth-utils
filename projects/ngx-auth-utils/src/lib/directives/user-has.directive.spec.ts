@@ -12,6 +12,8 @@ import { UserType } from '../interfaces';
         <div id="eq" *ngxAuthHas="'name'; eq: 'foo'">FooBar!</div>
         <div id="eqCondTrue" *ngxAuthHas="'name'; eq: 'foo'; cond: 1 == '1'">FooBar!</div>
         <div id="eqCondFalse" *ngxAuthHas="'name'; eq: 'foo'; cond: 1 === '1'">FooBar!</div>
+        <div id="eqElse" *ngxAuthHas="'name'; eq: 'nooooo'; else: elseTemplate">FooBar!</div>
+        <ng-template #elseTemplate><div id="eqElseTemplate">Else FooBar!</div></ng-template>
     `,
 })
 export class AboutComponent {}
@@ -111,5 +113,17 @@ describe('UserHasDirective', () => {
 
         const div: HTMLElement = fixture.nativeElement.querySelector('#eqCondFalse');
         expect(div).toBeNull();
+    });
+
+    it('shows else template if condition is false', () => {
+        const user = { user: 'username', name: 'foo' };
+        mockAuthState(user);
+
+        const div: HTMLElement = fixture.nativeElement.querySelector('#eqElse');
+        expect(div).toBeNull();
+
+        const divTemplate: HTMLElement = fixture.nativeElement.querySelector('#eqElseTemplate');
+        const contents = divTemplate.textContent;
+        expect(contents).toBe('Else FooBar!');
     });
 });

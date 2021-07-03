@@ -404,6 +404,17 @@ You might find this one very useful: add an additional condition to the `ngxAuth
 <div *ngxAuthHas="'groups'; any: ['FOO', 'BAR']; cond: a === 'hello'">Show if both user is in groups and condition evaluates to true</div>
 ```
 
+**Else template**
+
+Like `*ngIf`, the `*ngxAuthHas` directive supports the "else" template reference:
+
+```angular2html
+<div *ngxAuthHas="'name'; eq: 'foo'; else notHisName">User's name is foo!</div>
+<ng-template #notHisName>
+    User's name is not foo!
+</ng-template>
+```
+
 ### ngxAuthUser
 
 The `ngxAuthUser` directive provides the authenticated user instance directly in your templates:
