@@ -85,18 +85,7 @@ export class AuthUserPredicateGuard implements CanActivate, CanActivateChild, Ca
         }
 
         const attrValue = user[predicates.attribute];
-        switch (predicates.condition) {
-            case 'all':
-                return UserConditions.hasAllValues(attrValue, predicates.value);
-            case 'any':
-                return UserConditions.hasAnyValues(attrValue, predicates.value);
-            case 'none':
-                return UserConditions.hasNoneOfTheValues(attrValue, predicates.value);
-            case 'eq':
-                return UserConditions.hasEqValue(attrValue, predicates.value);
-            case 'ne':
-                return UserConditions.hasNeValue(attrValue, predicates.value);
-        }
+        return UserConditions.evaluate(predicates.condition, attrValue, predicates.value);
     }
 
     private validatePredicates(predicates: AuthUserPredicates | undefined): AuthUserPredicates {

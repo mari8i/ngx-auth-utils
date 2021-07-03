@@ -13,6 +13,10 @@ export type AuthUserType = any;
 
 export type UserType = AuthUserType | null;
 
+export type ConditionOperators = 'eq' | 'ne' | 'any' | 'all' | 'none';
+
+export type Condition = [attribute: string, condition: ConditionOperators, value: any];
+
 export interface AccessTokenModel {
     accessToken: string;
     refreshToken?: string;
@@ -21,7 +25,7 @@ export interface AccessTokenModel {
 }
 
 export interface AuthUserPredicates {
-    condition: 'eq' | 'ne' | 'any' | 'all' | 'none';
+    condition: ConditionOperators;
     attribute: string;
     value: any;
     redirectRoute?: string | false;

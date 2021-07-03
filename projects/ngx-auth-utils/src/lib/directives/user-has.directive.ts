@@ -2,7 +2,7 @@ import { Directive, Input, OnChanges, TemplateRef, ViewContainerRef } from '@ang
 import { AuthenticationService } from '../services/authentication.service';
 import { AuthConditionalDirective } from './auth-conditional.directive';
 import { UserConditions } from '../utils/user-conditions';
-import { AuthUserType, UserType } from '../interfaces';
+import { AuthUserType, Condition, UserType } from '../interfaces';
 
 @Directive({
     selector: '[ngxAuthHas]',
@@ -30,6 +30,12 @@ export class UserHasDirective extends AuthConditionalDirective implements OnChan
     ngxAuthHasCond = true;
 
     @Input()
+    ngxAuthHasUserCond?: Condition[];
+
+    @Input()
+    ngxAuthHasUserCondOp: 'and' | 'or' = 'and';
+
+    @Input()
     ngxAuthHasElse?: TemplateRef<unknown>;
 
     constructor(authenticationService: AuthenticationService, templateRef: TemplateRef<unknown>, viewContainer: ViewContainerRef) {
@@ -37,7 +43,7 @@ export class UserHasDirective extends AuthConditionalDirective implements OnChan
     }
 
     shouldShow(user: UserType): boolean {
-        return user != null && this.checkConditions(user) && this.ngxAuthHasCond;
+        return user != null && this.checkConditions(user) && this.ngxAuthHasCond && this.checkUserConditions(user);
     }
 
     protected getElseTemplateRef(): TemplateRef<unknown> | undefined {
@@ -76,5 +82,13 @@ export class UserHasDirective extends AuthConditionalDirective implements OnChan
 
     ngOnChanges(): void {
         this.updateView();
+    }
+
+    private checkUserConditions(user: UserType): boolean {
+        if (!this.ngxAuthHasUserCond) {
+            return true;
+        }
+
+        return UserConditions.evaluateConditions(user, this.ngxAuthHasUserCondOp, this.ngxAuthHasUserCond);
     }
 }
