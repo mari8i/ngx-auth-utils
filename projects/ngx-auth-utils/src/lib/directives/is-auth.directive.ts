@@ -1,7 +1,7 @@
 import { Directive, Input, OnChanges, TemplateRef, ViewContainerRef } from '@angular/core';
-import { AuthenticationService } from '../services/authentication.service';
 import { AuthConditionalDirective } from './auth-conditional.directive';
 import { UserType } from '../interfaces';
+import { NgxAuthService } from '../services/ngx-auth.service';
 
 @Directive({
     selector: '[ngxAuth]',
@@ -13,7 +13,7 @@ export class IsAuthDirective extends AuthConditionalDirective implements OnChang
     @Input()
     ngxAuthElse?: TemplateRef<unknown>;
 
-    constructor(authenticationService: AuthenticationService, templateRef: TemplateRef<unknown>, viewContainer: ViewContainerRef) {
+    constructor(authenticationService: NgxAuthService, templateRef: TemplateRef<unknown>, viewContainer: ViewContainerRef) {
         super(authenticationService, templateRef, viewContainer);
     }
 

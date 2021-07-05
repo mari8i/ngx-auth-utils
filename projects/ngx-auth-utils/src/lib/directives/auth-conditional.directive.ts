@@ -1,7 +1,7 @@
 import { OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
-import { AuthenticationService } from '../services/authentication.service';
 import { Subscription } from 'rxjs';
 import { UserType } from '../interfaces';
+import { NgxAuthService } from '../services/ngx-auth.service';
 
 export abstract class AuthConditionalDirective implements OnInit, OnDestroy {
     private showingThenTemplate?: 'then' | 'else';
@@ -10,13 +10,13 @@ export abstract class AuthConditionalDirective implements OnInit, OnDestroy {
     private user: UserType;
 
     public constructor(
-        protected authenticationService: AuthenticationService,
+        protected authService: NgxAuthService,
         protected templateRef: TemplateRef<unknown>,
         protected viewContainer: ViewContainerRef
     ) {}
 
     ngOnInit(): void {
-        this.authSub = this.authenticationService.getAuthenticationState().subscribe((user) => {
+        this.authSub = this.authService.state.subscribe((user) => {
             this.user = user;
             this.updateView();
         });

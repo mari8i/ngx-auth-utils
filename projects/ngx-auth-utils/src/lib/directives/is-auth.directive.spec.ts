@@ -4,6 +4,7 @@ import { AuthenticationService } from '../services/authentication.service';
 import { BehaviorSubject } from 'rxjs';
 import { IsAuthDirective } from './is-auth.directive';
 import { UserType } from '../interfaces';
+import { NgxAuthService } from '../services/ngx-auth.service';
 
 @Component({
     template: `
@@ -29,12 +30,13 @@ describe('IsAuthDirective', () => {
         const authSpy = jasmine.createSpyObj('AuthenticationService', ['getAuthenticationState']);
 
         fixture = TestBed.configureTestingModule({
-            providers: [{ provide: AuthenticationService, useValue: authSpy }],
+            providers: [{ provide: AuthenticationService, useValue: authSpy }, NgxAuthService],
             declarations: [TestComponent, IsAuthDirective],
             schemas: [NO_ERRORS_SCHEMA],
         }).createComponent(TestComponent);
 
         authService = TestBed.inject(AuthenticationService) as jasmine.SpyObj<AuthenticationService>;
+        TestBed.inject(NgxAuthService);
     });
 
     it('shows contents if user is authenticated', () => {
