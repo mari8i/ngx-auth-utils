@@ -9,7 +9,7 @@ export abstract class AuthConditionalDirective implements OnInit, OnDestroy {
     private authSub!: Subscription;
     private user: UserType;
 
-    protected constructor(
+    public constructor(
         protected authenticationService: AuthenticationService,
         protected templateRef: TemplateRef<unknown>,
         protected viewContainer: ViewContainerRef
