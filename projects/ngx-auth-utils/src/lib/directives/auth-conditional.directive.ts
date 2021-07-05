@@ -38,7 +38,7 @@ export abstract class AuthConditionalDirective implements OnInit, OnDestroy {
         }
     }
 
-    protected updateView(): void {
+    public updateView(): void {
         this.toggleTemplates(this.user, this.shouldShow(this.user));
     }
 
