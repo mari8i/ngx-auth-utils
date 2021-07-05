@@ -33,7 +33,8 @@ export class UserConditions {
     }
 
     public static evaluateCondition(user: UserType, condition: Condition): boolean {
-        return this.evaluate(condition[1], user[condition[0]], condition[2]);
+        const res = this.evaluate(condition[1], user[condition[0]], condition[2]);
+        return res;
     }
 
     public static evaluate(condition: ConditionOperators, userValue: unknown | unknown[], value: unknown | unknown[]): boolean {
