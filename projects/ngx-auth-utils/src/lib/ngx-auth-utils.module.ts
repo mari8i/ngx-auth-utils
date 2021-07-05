@@ -20,6 +20,7 @@ import { AuthExpiredInterceptor } from './interceptors/auth-expired.interceptor'
 import { UserHasDirective } from './directives/user-has.directive';
 import { IsAuthDirective } from './directives/is-auth.directive';
 import { UserDirective } from './directives/user.directive';
+import { NgxAuthService } from './services/ngx-auth.service';
 
 export interface NgxAuthUtilsConfig {
     authenticationProvider: Provider;
@@ -80,6 +81,7 @@ export class NgxAuthUtilsModule {
                 { provide: STORAGE_KEY_PREFIX, useValue: config?.storageKeyPrefix ?? 'ngx-auth' },
                 { provide: UNAUTHORIZED_URL_BLACKLIST, useValue: config.unauthorizedUrlBlacklist ?? [] },
                 AuthenticationService,
+                NgxAuthService,
             ],
         };
     }

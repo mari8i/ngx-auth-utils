@@ -4,6 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AuthenticationService } from '../services/authentication.service';
 import { BehaviorSubject } from 'rxjs';
 import { UserType } from '../interfaces';
+import { NgxAuthService } from '../services/ngx-auth.service';
 
 @Component({
     template: `
@@ -33,12 +34,13 @@ describe('UserHasDirective', () => {
         const authSpy = jasmine.createSpyObj('AuthenticationService', ['getAuthenticationState']);
 
         fixture = TestBed.configureTestingModule({
-            providers: [{ provide: AuthenticationService, useValue: authSpy }],
+            providers: [{ provide: AuthenticationService, useValue: authSpy }, NgxAuthService],
             declarations: [AboutComponent, UserHasDirective],
             schemas: [NO_ERRORS_SCHEMA],
         }).createComponent(AboutComponent);
 
         authService = TestBed.inject(AuthenticationService) as jasmine.SpyObj<AuthenticationService>;
+        TestBed.inject(NgxAuthService);
     });
 
     it('Hides contents when user is not authenticated', () => {

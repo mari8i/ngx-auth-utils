@@ -11,7 +11,7 @@ export class NgxAuthService implements OnDestroy {
         authenticated: false,
         user: null,
     };
-    private authStateSub: Subscription;
+    private authStateSub?: Subscription;
 
     /**
      * Emits the authentication state, which can be either:
@@ -41,20 +41,20 @@ export class NgxAuthService implements OnDestroy {
         return this.userSnapshot;
     }
 
-    constructor(private libAuthService: AuthenticationService) {
-        this.authStateSub = this.libAuthService.getAuthenticationState().subscribe((user) => {
-            this.userSnapshot = {
-                authenticated: user != null,
-                user: user,
-            };
-        });
-    }
+    constructor(private libAuthService: AuthenticationService) {}
 
     /**
      * Initializes the NgxAuthenticationService.
      * If configured and any authentication tokens are found it the storage, attempts auto-login.
      */
     public initialize(): Observable<UserType> {
+        this.authStateSub = this.libAuthService.getAuthenticationState().subscribe((user) => {
+            this.userSnapshot = {
+                authenticated: user != null,
+                user: user,
+            };
+        });
+
         return this.libAuthService.initialize();
     }
 
@@ -86,6 +86,6 @@ export class NgxAuthService implements OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.authStateSub.unsubscribe();
+        this.authStateSub?.unsubscribe();
     }
 }
