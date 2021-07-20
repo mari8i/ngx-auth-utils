@@ -24,13 +24,13 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         return next.handle(request).pipe(
             catchError((err: HttpErrorResponse) => {
-                if (err.status === 401 && this.authenticationService.hasRefreshToken()) {
-                    if (this.refreshToken && !this.isUrlInBlacklist(request.url)) {
+                if (err.status === 401) {
+                    if (this.authenticationService.hasRefreshToken() && this.refreshToken && !this.isUrlInBlacklist(request.url)) {
                         return this.handleTokenRefresh(next, request, err);
                     }
-
                     this.handle401Failure();
                 }
+
                 return throwError(err);
             })
         );
