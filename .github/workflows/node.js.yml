@@ -4,29 +4,28 @@
 name: Node.js CI
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 
 jobs:
-  build:
+    build:
+        runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [10.x, 12.x, 14.x, 15.x, 16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-    steps:
-    - uses: browser-actions/setup-chrome@latest
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: npm run prettier:check
-    - run: npx eslint --max-warnings 0 projects/
-    - run: npm run build:prod --if-present
-    - run: CHROME_BIN=chromium npm test   -- --no-watch --no-progress --browsers=ChromeHeadlessCI
+        strategy:
+            matrix:
+                node-version: [12.x, 14.x, 15.x, 16.x]
+                # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        steps:
+            - uses: browser-actions/setup-chrome@latest
+            - uses: actions/checkout@v2
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - run: npm ci
+            - run: npm run prettier:check
+            - run: npx eslint --max-warnings 0 projects/
+            - run: npm run build:prod --if-present
+            - run: CHROME_BIN=chromium npm test   -- --no-watch --no-progress --browsers=ChromeHeadlessCI

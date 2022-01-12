@@ -6,7 +6,7 @@ useTabs: false
 singleQuote: true
 
 overrides:
-  - files:
-      - "*.html"
-    options:
-      printWidth: 140
+    - files:
+          - '*.html'
+      options:
+          printWidth: 140
