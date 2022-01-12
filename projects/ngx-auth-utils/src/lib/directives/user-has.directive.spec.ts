@@ -11,7 +11,7 @@ import { NgxAuthService } from '../services/ngx-auth.service';
         <div id="any" *ngxAuthHas="'roles'; any: ['FOO', 'BAR']">FooBar!</div>
         <div id="all" *ngxAuthHas="'roles'; all: ['FOO', 'BAR']">FooBar!</div>
         <div id="eq" *ngxAuthHas="'name'; eq: 'foo'">FooBar!</div>
-        <div id="eqCondTrue" *ngxAuthHas="'name'; eq: 'foo'; cond: 1 == '1'">FooBar!</div>
+        <div id="eqCondTrue" *ngxAuthHas="'name'; eq: 'foo'; cond: 1 === 1">FooBar!</div>
         <div id="eqCondFalse" *ngxAuthHas="'name'; eq: 'foo'; cond: 1 === '1'">FooBar!</div>
         <div id="eqUserCond" *ngxAuthHas="'name'; eq: 'foo'; userCond: [['attr', 'eq', 'bar']]">FooBar!</div>
         <div id="eqElse" *ngxAuthHas="'name'; eq: 'nooooo'; else: elseTemplate">FooBar!</div>

@@ -1,8 +1,9 @@
-import { OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Directive, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { UserType } from '../interfaces';
 import { NgxAuthService } from '../services/ngx-auth.service';
 
+@Directive()
 export abstract class AuthConditionalDirective implements OnInit, OnDestroy {
     private showingThenTemplate?: 'then' | 'else';
 
