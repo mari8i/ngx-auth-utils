@@ -10,7 +10,8 @@
             "extends": [
                 "plugin:@typescript-eslint/recommended",
                 "plugin:@angular-eslint/recommended",
-                "plugin:@angular-eslint/template/process-inline-templates"
+                "plugin:@angular-eslint/template/process-inline-templates",
+                "plugin:@angular-eslint/recommended--extra"
             ],
             "rules": {
                 "@angular-eslint/directive-selector": [
@@ -38,7 +39,12 @@
                     }
                 ],
                 "no-debugger": ["error"],
-                "no-console": ["error", { "allow": ["error", "warn"] }],
+                "no-console": [
+                    "error",
+                    {
+                        "allow": ["error", "warn"]
+                    }
+                ],
                 "@typescript-eslint/no-explicit-any": ["off"]
             }
         },
