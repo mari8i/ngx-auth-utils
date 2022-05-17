@@ -85,6 +85,15 @@ export class NgxAuthService implements OnDestroy {
         this.libAuthService.logout();
     }
 
+    /**
+     * Login by having a token, most likely from a OAuth2 provider,
+     * that does not require the user to login with standard credentials
+     * @param token: The authentication token
+     */
+    public tokenLogin(token: string): Observable<UserType> {
+        return this.libAuthService.tokenLogin(token);
+    }
+
     ngOnDestroy(): void {
         this.authStateSub?.unsubscribe();
     }

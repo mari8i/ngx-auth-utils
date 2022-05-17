@@ -70,8 +70,7 @@ export class AuthenticationService {
                     this.storageProvider.setType(authResponse.dynamicStorage);
                 }
 
-                this.store(this.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
-                this.store(this.AUTH_ACCESS_TOKEN, authResponse.accessToken);
+                this.setAuthenticationToken(authResponse.accessToken);
 
                 if (authResponse.refreshToken) {
                     this.store(this.AUTH_REFRESH_TOKEN, authResponse.refreshToken);
@@ -87,6 +86,27 @@ export class AuthenticationService {
             }),
             tap((user) => this.events$.next(new AuthenticationEvent('login', user)))
         );
+    }
+
+    public tokenLogin(token: string): Observable<UserType> {
+        this.setAuthenticationToken(token);
+        return this.getAuthenticatedUser(true).pipe(
+            catchError((error) => {
+                this.events$.next(new AuthenticationEvent('login-failed', null));
+                return throwError(error);
+            }),
+            tap((user) => this.events$.next(new AuthenticationEvent('login', user)))
+        );
+    }
+
+    public setAuthenticationToken(authenticationToken: string): void {
+        if (authenticationToken) {
+            this.store(this.AUTH_IS_AUTHENTICATED, JSON.stringify(new Date()));
+            this.store(this.AUTH_ACCESS_TOKEN, authenticationToken);
+        } else {
+            this.clear(this.AUTH_ACCESS_TOKEN);
+            this.clear(this.AUTH_IS_AUTHENTICATED);
+        }
     }
 
     public refreshToken(): Observable<string> {
