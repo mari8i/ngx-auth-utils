@@ -94,6 +94,13 @@ export class NgxAuthService implements OnDestroy {
         return this.libAuthService.tokenLogin(token);
     }
 
+    /**
+     * Retrieve the authentication token
+     */
+    public getAccessToken(): string | null {
+        return this.libAuthService.getAccessToken();
+    }
+
     ngOnDestroy(): void {
         this.authStateSub?.unsubscribe();
     }
