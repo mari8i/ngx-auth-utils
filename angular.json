@@ -2,7 +2,7 @@
     "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
     "cli": {
         "analytics": "ddbbb158-dcc9-4d82-9f88-9a07cb0db520",
-        "defaultCollection": "@angular-eslint/schematics"
+        "schematicCollections": ["@angular-eslint/schematics"]
     },
     "version": 1,
     "newProjectRoot": "projects",
@@ -41,6 +41,5 @@
                 }
             }
         }
-    },
-    "defaultProject": "ngx-auth-utils"
+    }
 }
