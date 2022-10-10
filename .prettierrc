@@ -1,12 +1,6 @@
-# Prettier configuration
-
-printWidth: 140
-tabWidth: 4
-useTabs: false
-singleQuote: true
-
-overrides:
-    - files:
-          - '*.html'
-      options:
-          printWidth: 140
+{
+    "printWidth": 140,
+    "tabWidth": 4,
+    "useTabs": false,
+    "singleQuote": true
+}

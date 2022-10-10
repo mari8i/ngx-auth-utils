@@ -1,0 +1,36 @@
+name: Release
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    release:
+        name: Release
+        runs-on: ubuntu-latest
+        needs: []
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
+
+            - name: Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  cache: 'npm'
+                  node-version: 16
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: Build
+              run: npm run build
+
+            - name: Release
+              run: npm run release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
