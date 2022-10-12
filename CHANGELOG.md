@@ -1,3 +1,15 @@
+# [14.0.0](https://github.com/mari8i/ngx-auth-utils/compare/v13.0.0...v14.0.0) (2022-10-12)
+
+
+### Features
+
+* **bump version 14:** upgrade to angular 14 ([33275d7](https://github.com/mari8i/ngx-auth-utils/commit/33275d7be33fdb6694de0098031db3bc304f74e0))
+
+
+### BREAKING CHANGES
+
+* **bump version 14:** This is not backwards-compatible with angular 13
+
 # [2.0.0](https://github.com/mari8i/ngx-auth-utils/compare/v1.0.0...v2.0.0) (2022-10-12)
 
 
