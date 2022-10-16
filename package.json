@@ -1,15 +1,15 @@
 {
     "name": "ngx-auth-utils",
     "description": "A set of utilities to simplify the authentication integration in Angular applications.",
-    "version": "13.0.2",
+    "version": "14.0.0",
     "private": true,
     "scripts": {
         "build": "ng build",
         "build:ci": "ng build --configuration production",
         "test": "ng test",
         "test:ci": "ng test --no-watch --no-progress --browsers=ChromeHeadlessCI",
-        "format": "prettier . --write --ignore-path .gitignore",
-        "format:ci": "prettier . --check --ignore-path .gitignore",
+        "format": "prettier . --write",
+        "format:ci": "prettier . --check",
         "lint": "ng lint --fix",
         "lint:ci": "ng lint",
         "release": "HUSKY=0 semantic-release --no-ci",
