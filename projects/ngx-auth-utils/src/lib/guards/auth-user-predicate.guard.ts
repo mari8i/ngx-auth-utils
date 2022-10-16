@@ -4,6 +4,7 @@ import {
     CanActivate,
     CanActivateChild,
     CanLoad,
+    CanMatch,
     Route,
     Router,
     RouterStateSnapshot,
@@ -20,17 +21,12 @@ import { GLOBAL_USER_CONDITION_REDIRECT_URL } from '../config';
 @Injectable({
     providedIn: 'root',
 })
-export class AuthUserPredicateGuard implements CanActivate, CanActivateChild, CanLoad {
+export class AuthUserPredicateGuard implements CanActivate, CanActivateChild, CanLoad, CanMatch {
     constructor(
         private authenticationService: AuthenticationService,
         private router: Router,
         @Inject(GLOBAL_USER_CONDITION_REDIRECT_URL) private globalRedirectUrl?: string
     ) {}
-
-    /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
-    canLoad(route: Route, segments: UrlSegment[]): Observable<boolean | UrlTree> {
-        return this.checkConditions(route);
-    }
 
     /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
     canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
@@ -40,6 +36,16 @@ export class AuthUserPredicateGuard implements CanActivate, CanActivateChild, Ca
     /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
         return this.checkConditionsAndRedirect(route, state);
+    }
+
+    /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
+    canLoad(route: Route, segments: UrlSegment[]): Observable<boolean | UrlTree> {
+        return this.checkConditions(route);
+    }
+
+    /* eslint-disable-next-line  @typescript-eslint/no-unused-vars */
+    canMatch(route: Route): Observable<boolean | UrlTree> {
+        return this.checkConditions(route);
     }
 
     private checkConditionsAndRedirect(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {

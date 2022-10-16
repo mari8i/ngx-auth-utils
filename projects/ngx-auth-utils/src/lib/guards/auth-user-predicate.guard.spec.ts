@@ -1,5 +1,5 @@
 import { AuthUserPredicateGuard } from './auth-user-predicate.guard';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, Route, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { EMPTY, Observable, of } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { catchError } from 'rxjs/operators';
@@ -271,6 +271,15 @@ describe('AuthUserPredicateGuard', () => {
             guard.canActivate(route, fakeState).subscribe((res) => {
                 expect(res).toBeFalse();
                 expect(eventCalled).toBeTrue();
+                done();
+            });
+        });
+
+        it('Eq value emits true when can match', (done: DoneFn) => {
+            const route = createRouteSnapshotData({ condition: 'eq', attribute: 'username', value: 'foo' });
+            guard.canMatch(route as Route).subscribe((res) => {
+                expect(res).toBeTrue();
+                expect(eventCalled).toBeFalse();
                 done();
             });
         });

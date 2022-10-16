@@ -75,5 +75,15 @@ describe('AuthUserPredicateGuard', () => {
                 done();
             });
         });
+
+        it('emits true when user is authenticated and can match', (done: DoneFn) => {
+            const dummyUrlTree: UrlTree = new UrlTree();
+            routerSpy.parseUrl.and.returnValue(dummyUrlTree);
+
+            guard.canMatch().subscribe((res: UrlTree | boolean) => {
+                expect(res).toBeTrue();
+                done();
+            });
+        });
     });
 });

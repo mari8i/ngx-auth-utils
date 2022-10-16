@@ -4,6 +4,7 @@ import {
     CanActivate,
     CanActivateChild,
     CanLoad,
+    CanMatch,
     Route,
     Router,
     RouterStateSnapshot,
@@ -17,7 +18,7 @@ import { Observable } from 'rxjs';
 @Injectable({
     providedIn: 'root',
 })
-export class AuthUserGuard implements CanActivate, CanActivateChild, CanLoad {
+export class AuthUserGuard implements CanActivate, CanActivateChild, CanLoad, CanMatch {
     constructor(
         private authenticationService: AuthenticationService,
         private router: Router,
@@ -33,6 +34,10 @@ export class AuthUserGuard implements CanActivate, CanActivateChild, CanLoad {
     }
 
     canLoad(): Observable<boolean> {
+        return this.checkAuthentication();
+    }
+
+    canMatch(): Observable<boolean> {
         return this.checkAuthentication();
     }
 
