@@ -1,3 +1,10 @@
+# [14.1.0](https://github.com/mari8i/ngx-auth-utils/compare/v14.0.0...v14.1.0) (2022-10-25)
+
+
+### Features
+
+* **app configuration:** remove authorization header strict prefix, can now be any string ([#33](https://github.com/mari8i/ngx-auth-utils/issues/33)) ([068b7f1](https://github.com/mari8i/ngx-auth-utils/commit/068b7f1f1ad53e65472b980337c48ca2ced0eac4))
+
 # [14.0.0](https://github.com/mari8i/ngx-auth-utils/compare/v13.0.0...v14.0.0) (2022-10-12)
 
 
