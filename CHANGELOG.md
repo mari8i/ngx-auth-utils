@@ -1,3 +1,10 @@
+## [14.1.1](https://github.com/mari8i/ngx-auth-utils/compare/v14.1.0...v14.1.1) (2022-10-25)
+
+
+### Bug Fixes
+
+* **fix required angular version:** fix required angular version ([#34](https://github.com/mari8i/ngx-auth-utils/issues/34)) ([f0d98ff](https://github.com/mari8i/ngx-auth-utils/commit/f0d98ff01e0f7f6b09205eb9fb9c93995ff8b411))
+
 # [14.1.0](https://github.com/mari8i/ngx-auth-utils/compare/v14.0.0...v14.1.0) (2022-10-25)
 
 
