@@ -1,8 +1,8 @@
 {
     "name": "ngx-auth-utils",
     "description": "A set of utilities to simplify the authentication integration in Angular applications.",
-    "version": "14.0.0",
-    "private": true,
+    "version": "14.0.1",
+    "private": false,
     "scripts": {
         "build": "ng build",
         "build:ci": "ng build --configuration production",
