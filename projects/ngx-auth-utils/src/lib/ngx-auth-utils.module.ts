@@ -26,7 +26,7 @@ export interface NgxAuthUtilsConfig {
     authenticationProvider: Provider;
     storageProvider?: Provider;
     authenticationHeader?: string;
-    tokenType?: 'Token' | 'Bearer';
+    tokenType?: 'Token' | 'Bearer' | string;
     homeUrl?: string;
     noAuthRedirectUrl?: string;
     sessionExpiredRedirectUrl?: string;
