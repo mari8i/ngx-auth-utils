@@ -1,3 +1,10 @@
+## [14.0.1](https://github.com/mari8i/ngx-auth-utils/compare/v14.0.0...v14.0.1) (2023-03-28)
+
+
+### Bug Fixes
+
+* change interceptor unauthorized url blacklist match ([#45](https://github.com/mari8i/ngx-auth-utils/issues/45)) ([ceb8112](https://github.com/mari8i/ngx-auth-utils/commit/ceb8112a4a728bfbd0798d174a9c4949e895b0b4))
+
 # [14.0.0](https://github.com/mari8i/ngx-auth-utils/compare/v13.0.0...v14.0.0) (2022-10-12)
 
 
