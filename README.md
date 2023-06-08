@@ -1,3 +1,5 @@
+> This work has been superseeded by [@zupit-it/ng-auth](https://github.com/zupit-it/zupit-angular/tree/main/packages/ng-auth)
+
 # NgxAuthUtils
 
 An Angular library to ease the authentication integration with a backend.
