@@ -1,3 +1,11 @@
+## [14.1.3](https://github.com/mari8i/ngx-auth-utils/compare/v14.1.2...v14.1.3) (2023-12-04)
+
+
+### Bug Fixes
+
+* add project moved disclaimer ([07b20d4](https://github.com/mari8i/ngx-auth-utils/commit/07b20d4b251911dbadc65799174b7282bd98f03b))
+* blacklist url parsing ([#47](https://github.com/mari8i/ngx-auth-utils/issues/47)) ([9ecbd9f](https://github.com/mari8i/ngx-auth-utils/commit/9ecbd9f042d90fee6cecfe997a200d31bb3022f7))
+
 ## [14.1.2](https://github.com/mari8i/ngx-auth-utils/compare/v14.1.1...v14.1.2) (2023-03-28)
 
 
