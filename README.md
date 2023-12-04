@@ -1,13 +1,12 @@
 # NgxAuthUtils
 
-
 > **IMPORTANT**
 >
 > The project has moved to https://github.com/zupit-it/zupit-angular
 >
 > npmjs: https://www.npmjs.com/package/@zupit-it/ng-auth
 
-----------------------
+---
 
 An Angular library to ease the authentication integration with a backend.
 
