@@ -75,6 +75,14 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
             console.warn('ngx-auth-utils: Refresh token feature is enabled but unauthorizedUrlBlacklist is empty');
             console.warn('ngx-auth-utils: Blacklist at least the refresh token URL for correct session expiration handling');
         }
-        return this.unauthorizedUrlBlacklist.includes(new URL(url).pathname);
+
+        return this.unauthorizedUrlBlacklist.includes(this.getPathName(url));
+    }
+
+    private getPathName(url: string): string {
+        if (url.toLowerCase().startsWith('http')) {
+            return new URL(url).pathname;
+        }
+        return url;
     }
 }
